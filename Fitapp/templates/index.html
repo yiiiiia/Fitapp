@@ -76,7 +76,7 @@
                 body: JSON.stringify({username, password})
             }).then(response => {
                 if (response.status === 200) {
-                    window.location.href = '/dashboard'; // 登录成功，跳转到 Dashboard
+                    window.location.href = 'userprofile/update_profile'; // 登录成功，跳转到 Dashboard
                 } else {
                     alert('登录失败');
                     // 处理登录失败的逻辑
