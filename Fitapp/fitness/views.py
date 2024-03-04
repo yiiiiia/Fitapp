@@ -2,6 +2,9 @@ from django.shortcuts import render, redirect
 from .forms import ExerciseBookForm
 from .models import ExerciseBook
 
+def dashboard(request):
+    return render(request, 'dashboard.html', {})
+
 def add_exercise(request):
     print("进入了 add_exercise 视图")
     if request.method == 'POST':
