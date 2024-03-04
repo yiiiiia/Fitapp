@@ -23,6 +23,7 @@
 
         <button type="submit">Update Profile</button>
     </form>
+    <button id="go-to-add-food">Add Food Eaten</button>
 
     <script>
         document.getElementById('update-profile-form').addEventListener('submit', function(e) {
@@ -74,6 +75,9 @@
             .catch(error => console.error('Error:', error));
         });
 
+        document.getElementById('go-to-add-food').addEventListener('click', function() {
+        window.location.href = '/nutrition/add-food-eaten';
+        });
     </script>
 </body>
 </html>

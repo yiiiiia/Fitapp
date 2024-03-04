@@ -3,18 +3,32 @@ from .models import FoodEaten, DailyMetabolism, FoodBook
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from django.utils import timezone
+from django.http import JsonResponse
 from .forms import FoodEatenForm, DailyMetabolismForm, FoodBookForm
 
-def add_food_eaten(request):
-    if request.method == 'POST':
-        form = FoodEatenForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('some_view')
-    else:
-        form = FoodEatenForm()
+class FoodListView(APIView):
+    def get(self, request):
+        foods = FoodBook.objects.all()
+        data = [{"id": food.id, "name": food.food_name} for food in foods]
+        return Response(data)
     
-    return render(request, 'add_food_eaten.html', {'form': form})
+def show_add_food_eaten_page(request):
+    return render(request, 'add_food_eaten.html')
+    
+class AddFoodEatenView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        food_id = request.data.get('food')
+        amount = request.data.get('amount')
+        date = request.data.get('date') or timezone.now().date()
+
+        food = FoodBook.objects.get(id=food_id)
+        FoodEaten.objects.create(user=user, food=food, amount=amount, date=date)
+
+        return JsonResponse({'message': 'Food added successfully'})
 
 class UserRelatedDataView(APIView):
     permission_classes = [IsAuthenticated]
