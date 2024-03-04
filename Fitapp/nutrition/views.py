@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect
-from .models import FoodEaten, DailyMetabolism
+from .models import FoodEaten, DailyMetabolism, FoodBook
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from .forms import FoodEatenForm, DailyMetabolismForm
+from .forms import FoodEatenForm, DailyMetabolismForm, FoodBookForm
 
 def add_food_eaten(request):
     if request.method == 'POST':
@@ -32,3 +32,14 @@ class UserRelatedDataView(APIView):
             'foods_eaten': foods_eaten,
             'daily_metabolism': daily_metabolism
         })
+    
+def add_food(request):
+    print("进入了 add_food 视图")
+    if request.method == 'POST':
+        form = FoodBookForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('some_view_name')
+    else:
+        form = FoodBookForm()
+    return render(request, 'add_food.html', {'form': form})

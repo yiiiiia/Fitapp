@@ -21,7 +21,7 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('admin/', admin.site.urls),
     path('fitness/', include('fitness.urls')),
-    path('food_eaten/', include('nutrition.urls')),
+    path('nutrition/', include('nutrition.urls')),
     path('content/', include('content_interaction.urls')),
     path('userprofile/', include('UserProfile.urls')),
 ]

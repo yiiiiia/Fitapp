@@ -3,6 +3,7 @@ from .views import UserRelatedDataView
 from . import views
 
 urlpatterns = [
+    path('add_food/', views.add_food, name='add_food'),
     path('add_food_eaten/', views.add_food_eaten, name='add_food_eaten'),
     path('user-data/', UserRelatedDataView.as_view(), name='user-data'),
 ]
