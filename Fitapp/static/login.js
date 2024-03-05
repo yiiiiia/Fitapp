@@ -17,8 +17,8 @@ const app = createApp({
             this.loginErr = true
         },
         async submit() {
-            const csrftoken = Cookies.get('csrftoken');
             try {
+                const csrftoken = Cookies.get('csrftoken');
                 const resp = await fetch('/userprofile/login/', {
                     method: 'post',
                     mode: 'same-origin',
@@ -30,7 +30,9 @@ const app = createApp({
                 })
                 if (resp.status == 200) {
                     this.setNormal()
-                    window.location.href = this.$refs.redirect_url.href
+                    resp.json().then((value) => {
+                        window.location.href = value.next_page
+                    })
                 } else if (resp.status == 404) {
                     this.setError()
                 } else {

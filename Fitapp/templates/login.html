@@ -7,16 +7,15 @@
         <div class="container">
             <div class="columns is-centered">
                 <div id="app" class="column is-5-tablet is-5-desktop is-4-widescreen">
-                    <a class="is-hidden" ref="redirect_url" href="{% url 'dashboard' %}"></a>
-                    <form class="box" action="/userprofile/login/" method="post" @submit.prevent="submit" ref="form">
+                    <form class="box" @submit.prevent="submit" ref="form">
                         {% csrf_token %}
                         <div class="field">
                             <label class="label">User Name</label>
                             <div class="control has-icons-left">
-                                <input type="input" name="username" placeholder="@username" v-model.trim="form.username"
+                                <input type="input" placeholder="@username" v-model.trim="form.username"
                                     v-bind:class="inputClass" @focus="setNormal" required />
                                 <span class="icon is-small is-left">
-                                    <i class="fa fa-envelope"></i>
+                                    <i class="fas fa-user"></i>
                                 </span>
                                 <p v-if="loginErr" class="help is-danger">user does not exist or wrong password</p>
                             </div>
@@ -24,10 +23,10 @@
                         <div class="field">
                             <label class="label">Password</label>
                             <div class="control has-icons-left">
-                                <input type="password" name="password" placeholder="@password" v-bind:class="inputClass"
+                                <input type="password" placeholder="@password" v-bind:class="inputClass"
                                     v-model.trim="form.password" required />
                                 <span class="icon is-small is-left">
-                                    <i class="fa fa-lock"></i>
+                                    <i class="fas fa-lock"></i>
                                 </span>
                             </div>
                         </div>
@@ -41,12 +40,13 @@
                             <button class="button is-success is-fullwidth">Login</button>
                         </div>
                         <p class="has-text-centered has-text-link is-size-6">
-                            <a href="#">Forgot Password?</a>
+                            <a>Forgot Password?</a>
                         </p>
                         <hr />
                         <p class="has-text-centered is-size-6 mb-2">New to 35 Fit?</p>
                         <div class="field">
-                            <button class="button is-fullwidth is-primary is-light">Join now</button>
+                            <button class="button is-fullwidth is-primary is-light"><a href="{% url 'signup'  %}">Join
+                                    now</a></button>
                         </div>
                     </form>
                 </div>
