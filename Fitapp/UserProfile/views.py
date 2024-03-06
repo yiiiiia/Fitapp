@@ -1,38 +1,70 @@
 # views.py
-from rest_framework.views import APIView
-from rest_framework.response import Response
+import logging
+from urllib import request
+
 from django.contrib.auth import authenticate
-from django.http import JsonResponse
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
+from django.http import JsonResponse
+from django.shortcuts import redirect, render
+from django.urls import reverse
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
 from .models import UserProfile
-from .models import AuthToken
-from django.shortcuts import render
-import logging
 
 logger = logging.getLogger(__name__)
 
+
+def set_user_in_session(request, user):
+    request.session['user_id'] = user.id
+    request.session.set_expiry(24 * 3600)
+
+
+def login_required(func):
+    def wrapper(request):
+        if request.session.get('user_id'):
+            print('user has logged in, id: ' +
+                  str(request.session.get('user_id')))
+            return func(request)
+        else:
+            return redirect('login')
+    return wrapper
+
+
 class LoginView(APIView):
+    def get(self, request):
+        if request.session.get('user_id'):
+            return redirect('dashboard')
+        else:
+            return render(request, 'login.html')
+
     def post(self, request, *args, **kwargs):
         username = request.data.get('username')
         password = request.data.get('password')
-        logger.error(username)
-        logger.error(password)
         user = authenticate(username=username, password=password)
         if user:
-            # 创建或获取 token
-            token, created = AuthToken.objects.get_or_create(user=user)
-            response = Response()
-            response.set_cookie(key='access_token', value=str(token.token), httponly=True)
-            return response
+            set_user_in_session(request, user)
+            next_page = reverse('dashboard')
+            return JsonResponse({'next_page': next_page}, status=200)
         else:
             if User.objects.filter(username=username).exists():
                 logger.error("User exists, but authentication failed.")
+                return JsonResponse({'error': 'incorrect password'}, status=404)
             else:
                 logger.error("User does not exist.")
-            return Response(status=404)
+                return JsonResponse({'error': 'user not exist'}, status=404)
+
+
 class SignupView(APIView):
+    def get(self, request):
+        if request.session.get('user_id'):
+            return redirect('dashboard')
+        else:
+            loginURL = reverse('login')
+            return render(request, 'signup.html', {'login_page': loginURL})
+
     def post(self, request, *args, **kwargs):
         username = request.data.get('username')
         email = request.data.get('email')
@@ -53,17 +85,37 @@ class SignupView(APIView):
             password=make_password(password)  # 密码加密
         )
         user.save()
-
         return JsonResponse({'message': 'User created successfully'}, status=201)
-    
+
+
+# implement for font-end validation
+def check_username_email(request):
+    username = request.GET.get('username')
+    email = request.GET.get('email')
+    if username:
+        if User.objects.filter(username=username).exists():
+            return JsonResponse({'exists': True}, status=200)
+        else:
+            return JsonResponse({'exists': False}, status=200)
+    elif email:
+        if User.objects.filter(email=email).exists():
+            return JsonResponse({'exists': True}, status=200)
+        else:
+            return JsonResponse({'exists': False}, status=200)
+    else:
+        return JsonResponse({'error': 'invalid parameter'}, status=400)
+
+
 def update_profile(request):
     return render(request, 'update_profile.html')
+
 
 class UserProfileUpdateView(APIView):
     permission_classes = [IsAuthenticated]
 
     def put(self, request, *args, **kwargs):
-        user_profile, created = UserProfile.objects.get_or_create(user=request.user)
+        user_profile, created = UserProfile.objects.get_or_create(
+            user=request.user)
         user_profile.gender = request.data.get('gender')
         user_profile.age = request.data.get('age')
         user_profile.height = request.data.get('height')

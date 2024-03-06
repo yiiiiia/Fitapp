@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Login Fit 35{% endblock %}
+{% block content %}
+<section class="hero is-primary is-fullheight">
+    <div class="hero-body">
+        <div class="container">
+            <div class="columns is-centered">
+                <div id="app" class="column is-5-tablet is-5-desktop is-4-widescreen">
+                    <form class="box" @submit.prevent="submit" ref="form">
+                        {% csrf_token %}
+                        <div class="field">
+                            <label class="label">User Name</label>
+                            <div class="control has-icons-left">
+                                <input type="input" placeholder="@username" v-model.trim="form.username"
+                                    v-bind:class="inputClass" @focus="setNormal" required />
+                                <span class="icon is-small is-left">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                                <p v-if="loginErr" class="help is-danger">user does not exist or wrong password</p>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Password</label>
+                            <div class="control has-icons-left">
+                                <input type="password" placeholder="@password" v-bind:class="inputClass"
+                                    v-model.trim="form.password" required />
+                                <span class="icon is-small is-left">
+                                    <i class="fas fa-lock"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="checkbox">
+                                <input type="checkbox" />
+                                Remember me
+                            </label>
+                        </div>
+                        <div class="field">
+                            <button class="button is-success is-fullwidth">Login</button>
+                        </div>
+                        <p class="has-text-centered has-text-link is-size-6">
+                            <a>Forgot Password?</a>
+                        </p>
+                        <hr />
+                        <p class="has-text-centered is-size-6 mb-2">New to 35 Fit?</p>
+                        <div class="field">
+                            <button class="button is-fullwidth is-primary is-light"><a href="{% url 'signup'  %}">Join
+                                    now</a></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script src="{% static 'login.js' %}"></script>
+{% endblock %}

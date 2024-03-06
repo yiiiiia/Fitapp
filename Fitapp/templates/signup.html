@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Join Fit 35{% endblock %}
+{% block footer %}{% endblock %}
+{% block content %}
+<section class="hero is-primary is-fullheight">
+    <div class="hero-body">
+        <div class="container">
+            <div class="columns is-centered">
+                <div id="app" class="column is-mobile is-3-tablet is-3-desktop is-4-widescreen">
+                    <form class="box" action="{% url 'signup' %}" @submit.prevent="submit" ref="form">
+                        {% csrf_token %}
+                        <a class="is-hidden" href="{% url 'login' %}" ref="redirect_page"></a>
+                        <div class="field">
+                            <label class="label">User Name</label>
+                            <div class="control has-icons-left has-icons-right">
+                                <input v-bind:class="username.style" type="input" placeholder="@username"
+                                    v-model.trim="form.username" @blur="check_username" @input="change_username"
+                                    required />
+                                <span class="icon is-small is-left">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                                <div v-show="username.checkOk">
+                                    <span class="icon is-small is-right">
+                                        <i class="fas fa-check"></i>
+                                    </span>
+                                </div>
+                                <div v-show="username.checkErr">
+                                    <span class="icon is-small is-right">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                    </span>
+                                    <p class="help is-danger">[[ username.msg ]]</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Email</label>
+                            <div class="control has-icons-left has-icons-right">
+                                <input v-bind:class="email.style" type="email" placeholder="@email"
+                                    v-model.trim="form.email" @blur="check_email" @input="change_email" required />
+                                <span class="icon is-small is-left">
+                                    <i class="fas fa-envelope"></i>
+                                </span>
+                                <div v-show="email.checkOk">
+                                    <span class="icon is-small is-right">
+                                        <i class="fas fa-check"></i>
+                                    </span>
+                                </div>
+                                <div v-show="email.checkErr">
+                                    <span class="icon is-small is-right">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                    </span>
+                                    <p class="help is-danger">[[ email.msg ]]
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Password</label>
+                            <div class="control has-icons-left has-icons-right">
+                                <input v-bind:class="password.style" type="password" placeholder="@password"
+                                    v-model.trim="form.password" @blur="check_password" @input="change_password"
+                                    required />
+                                <span class="icon is-small is-left">
+                                    <i class="fa fa-lock"></i>
+                                </span>
+                                <div v-show="password.checkOk">
+                                    <span class="icon is-small is-right">
+                                        <i class="fas fa-check"></i>
+                                    </span>
+                                </div>
+                                <div v-show="password.checkErr">
+                                    <span class="icon is-small is-right">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                    </span>
+                                    <p class="help is-danger">[[ password.msg ]]
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Confirm Password</label>
+                            <div class="control has-icons-left has-icons-right">
+                                <input v-bind:class="password2.style" type="password" placeholder="@password"
+                                    v-model.trim="form.password_confirm" @blur="check_pass_confirm" required />
+                                <span class="icon is-small is-left">
+                                    <i class="fa fa-lock"></i>
+                                </span>
+                                <div v-show="password2.checkOk">
+                                    <span class="icon is-small is-right">
+                                        <i class="fas fa-check"></i>
+                                    </span>
+                                </div>
+                                <div v-show="password2.checkErr">
+                                    <span class="icon is-small is-right">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                    </span>
+                                    <p class="help is-danger">[[ password2.msg ]]
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="checkbox">
+                                <input type="checkbox" v-model="form.agree">
+                                I agree to the <a href="#"><span class="has-text-link">terms and conditions</span></a>
+                            </label>
+                            <p v-show="form.needConfirm" class="help is-danger">Confirm the terms and conditions before
+                                submit</p>
+                        </div>
+                        <div class="field">
+                            <button class="button is-success is-fullwidth">Join</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script src="{% static 'signup.js' %}"></script>
+{% endblock %}
