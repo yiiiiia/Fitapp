@@ -2,10 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b28be970-bfef-43a4-8bf2-f46998765f24" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nutrition/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/nutrition/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nutrition/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/nutrition/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/add_food_eaten.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/add_food_eaten.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -230,6 +227,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
@@ -283,15 +281,15 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1709566437608</updated>
-      <workItem from="1709566445809" duration="12202000" />
+      <workItem from="1709566445809" duration="12477000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="12202000" />
+    <option name="totallyTimeSpent" value="12477000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="603" y="72" width="1158" height="872" extended-state="0" />
+    <frame x="608" y="71" width="1158" height="872" extended-state="0" />
     <layout>
       <window_info id="Favorites" sideWeight="0.5017857" side_tool="true" visible="true" weight="0.1953405" />
       <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49821427" visible="true" weight="0.1953405" />
