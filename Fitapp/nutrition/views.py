@@ -7,6 +7,10 @@ from django.utils import timezone
 from django.http import JsonResponse
 from .forms import FoodEatenForm, DailyMetabolismForm, FoodBookForm
 
+from datetime import timedelta
+from django.utils import timezone
+
+
 class FoodListView(APIView):
     def get(self, request):
         foods = FoodBook.objects.all()
@@ -57,3 +61,23 @@ def add_food(request):
     else:
         form = FoodBookForm()
     return render(request, 'add_food.html', {'form': form})
+
+
+def foodlist(request):
+    if request.method == "GET":
+        return render(request,"food_list.html")
+
+
+
+def metabolism_view(request):
+    today = timezone.now().date()
+    metabolisms = DailyMetabolism.objects.filter(user=request.user, date=today).values('id', 'bmr', 'intake', 'exercise_metabolism', 'total')  # 获取所有记录的特定字段
+    metabolisms_list = list(metabolisms)  # 将QuerySet转换为列表
+    return JsonResponse(metabolisms_list, safe=False)
+
+def metabolism_7days(request):
+    today = timezone.now().date()
+    week_ago = today - timedelta(days=7)
+    metabolisms = DailyMetabolism.objects.filter(user=request.user, date__range=[week_ago, today]).values('date', 'bmr', 'intake', 'exercise_metabolism', 'total')
+    metabolisms_7dayslist = list(metabolisms)
+    return JsonResponse(metabolisms_7dayslist, safe=False)

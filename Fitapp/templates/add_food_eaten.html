@@ -14,6 +14,29 @@
         <button type="submit">Add Food</button>
     </form>
 
+    <div>
+
+        <button onclick="window.location.href = '{% url 'foodlist' %}'">Go to Food List</button>
+
+        <ul id="metabolism-list"></ul>
+
+    </div>
+
+    <table id="metabolism-table">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>BMR</th>
+            <th>Intake</th>
+            <th>Exercise Metabolism</th>
+            <th>Total</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+
     <script>
         function getCookie(name) {
                 let cookieValue = null;
@@ -66,6 +89,58 @@
             })
             .catch(error => console.error('Error:', error));
         });
+
+
+          document.addEventListener('DOMContentLoaded', function() {
+            fetch('/nutrition/metabolism/')
+            .then(response => response.json())
+            .then(data => {
+                const metabolismList = document.getElementById('metabolism-list');
+                data.forEach(item => {
+                    let listItem = document.createElement('li');
+                    listItem.textContent = `BMR: ${item.bmr}, Intake: ${item.intake}, Exercise Metabolism: ${item.exercise_metabolism}, Total: ${item.total}`;
+                    metabolismList.appendChild(listItem);
+                });
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/nutrition/metabolism_7days/')
+            .then(response => response.json())
+            .then(data => {
+                const table = document.getElementById('metabolism-table').getElementsByTagName('tbody')[0];
+                const today = new Date();
+                for (let i = 0; i < 7; i++) {
+                    let date = new Date();
+                    date.setDate(today.getDate() - i);
+                    const dateString = date.toISOString().split('T')[0];
+
+                    let dataForDate = data.find(item => item.date === dateString);
+                    let row = table.insertRow(0);
+                    let dateCell = row.insertCell(0);
+                    let bmrCell = row.insertCell(1);
+                    let intakeCell = row.insertCell(2);
+                    let exerciseMetabolismCell = row.insertCell(3);
+                    let totalCell = row.insertCell(4);
+
+                    dateCell.textContent = dateString;
+                    bmrCell.textContent = dataForDate ? dataForDate.bmr : "null";
+                    intakeCell.textContent = dataForDate ? dataForDate.intake : "null";
+                    exerciseMetabolismCell.textContent = dataForDate ? dataForDate.exercise_metabolism : "null";
+                    totalCell.textContent = dataForDate ? dataForDate.total : "null";
+                }
+            });
+        });
+
+
+
+
+
+
+
+
+
+
     </script>
 </body>
 </html>

@@ -8,4 +8,7 @@ urlpatterns = [
     path('add_food_eaten', AddFoodEatenView.as_view(), name='add_food_eaten'),
     path('user-data/', UserRelatedDataView.as_view(), name='user-data'),
     path('foods/', FoodListView.as_view(), name='food-list'),
+    path('foodlist/', views.foodlist, name='foodlist'),
+    path('metabolism/', views.metabolism_view, name='metabolism'),
+    path('metabolism_7days/', views.metabolism_7days, name='metabolism_7days'),
 ]
