@@ -10,4 +10,5 @@ urlpatterns = [
     path('check_username_email/', views.check_username_email),
     path('profile/', UserProfileUpdateView.as_view(), name='profile-update'),
     path('update_profile/', views.update_profile, name='update_profile'),
+
 ]

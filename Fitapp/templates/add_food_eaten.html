@@ -14,6 +14,63 @@
         <button type="submit">Add Food</button>
     </form>
 
+    <div>
+        <a href="{% url 'logout' %}">Logout</a>
+
+        <button onclick="window.location.href = '{% url 'foodlist' %}'">Go to Food List</button>
+
+        <ul id="metabolism-list"></ul>
+
+    </div>
+
+    <table id="metabolism-table">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>BMR</th>
+            <th>Intake</th>
+            <th>Exercise Metabolism</th>
+            <th>Total</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+
+    <h1>Food Eaten Records</h1>
+    <ul id="food-eaten-list"></ul>
+
+
+
+
+ <h1>Food Eaten Records</h1>
+    <table id="foodRecordsTable">
+        <thead>
+            <tr>
+                <th>Food Name</th>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>Calories Per Gram</th>
+                <th>Protein Per Gram</th>
+                <th>Fat Per Gram</th>
+                <th>Carbohydrate Per Gram</th>
+                <th>Other Per Gram</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Data will be inserted here by JavaScript -->
+        </tbody>
+    </table>
+
+  <p>Total Calories: <span id="totalCalories">0</span></p>
+    <p>Total Protein Consumed: <span id="totalProtein">0</span></p>
+    <p>Total Fat Consumed: <span id="totalFat">0</span></p>
+    <p>Total Carbohydrate Consumed: <span id="totalCarbohydrate">0</span></p>
+
+
+</body>
+
     <script>
         function getCookie(name) {
                 let cookieValue = null;
@@ -66,6 +123,115 @@
             })
             .catch(error => console.error('Error:', error));
         });
+
+
+          document.addEventListener('DOMContentLoaded', function() {
+            fetch('/nutrition/metabolism/')
+            .then(response => response.json())
+            .then(data => {
+                const metabolismList = document.getElementById('metabolism-list');
+                data.forEach(item => {
+                    let listItem = document.createElement('li');
+                    listItem.textContent = `BMR: ${item.bmr}, Intake: ${item.intake}, Exercise Metabolism: ${item.exercise_metabolism}, Total: ${item.total}`;
+                    metabolismList.appendChild(listItem);
+                });
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/nutrition/metabolism_7days/')
+            .then(response => response.json())
+            .then(data => {
+                const table = document.getElementById('metabolism-table').getElementsByTagName('tbody')[0];
+                const today = new Date();
+                for (let i = 0; i < 7; i++) {
+                    let date = new Date();
+                    date.setDate(today.getDate() - i);
+                    const dateString = date.toISOString().split('T')[0];
+
+                    let dataForDate = data.find(item => item.date === dateString);
+                    let row = table.insertRow(0);
+                    let dateCell = row.insertCell(0);
+                    let bmrCell = row.insertCell(1);
+                    let intakeCell = row.insertCell(2);
+                    let exerciseMetabolismCell = row.insertCell(3);
+                    let totalCell = row.insertCell(4);
+
+                    dateCell.textContent = dateString;
+                    bmrCell.textContent = dataForDate ? dataForDate.bmr : "null";
+                    intakeCell.textContent = dataForDate ? dataForDate.intake : "null";
+                    exerciseMetabolismCell.textContent = dataForDate ? dataForDate.exercise_metabolism : "null";
+                    totalCell.textContent = dataForDate ? dataForDate.total : "null";
+                }
+            });
+        });
+
+
+         document.addEventListener('DOMContentLoaded', function() {
+            fetch('/nutrition/food_daily/')
+                .then(response => response.json())
+                .then(data => {
+                    const list = document.getElementById('food-eaten-list');
+                    if (data.length > 0) {
+                        data.forEach(item => {
+                            const li = document.createElement('li');
+                            li.textContent = `${item.food} - ${item.amount} on ${item.date}`;
+                            list.appendChild(li);
+                        });
+                    } else {
+                        list.textContent = 'No records found.';
+                    }
+                });
+        });
+
+
+          fetch('/nutrition/food_records/')
+            .then(response => response.json())
+            .then(data => {
+                const table = document.getElementById('foodRecordsTable').getElementsByTagName('tbody')[0];
+                let totalCaloriesConsumed = 0;
+                let totalProteinConsumed = 0;
+                let totalFatConsumed = 0;
+                let totalCarbohydrateConsumed = 0;
+
+                data.food_eaten_records.forEach(record => {
+                    let totalCaloriesForRecord = record.amount * record.food__calories_per_gram;
+                    totalCaloriesConsumed += totalCaloriesForRecord;
+                    let totalProteinForRecord = record.amount * record.food__protein_per_gram;
+                    let totalFatForRecord = record.amount * record.food__fat_per_gram;
+                    let totalCarbohydrateForRecord = record.amount * record.food__carbohydrate_per_gram;
+                    totalProteinConsumed += totalProteinForRecord;
+                    totalFatConsumed += totalFatForRecord;
+                    totalCarbohydrateConsumed += totalCarbohydrateForRecord;
+
+
+
+
+                    let row = table.insertRow();
+                    row.insertCell(0).textContent = record.food__food_name;
+                    row.insertCell(1).textContent = record.amount;
+                    row.insertCell(2).textContent = record.date;
+                    row.insertCell(3).textContent = record.food__calories_per_gram;
+                    row.insertCell(4).textContent = record.food__protein_per_gram;
+                    row.insertCell(5).textContent = record.food__fat_per_gram;
+                    row.insertCell(6).textContent = record.food__carbohydrate_per_gram;
+                    row.insertCell(7).textContent = record.food__other_per_gram;
+
+
+                });
+                document.getElementById('totalCalories').textContent = totalCaloriesConsumed.toFixed(2);
+                document.getElementById('totalProtein').textContent = totalProteinConsumed.toFixed(2);
+                document.getElementById('totalFat').textContent = totalFatConsumed.toFixed(2);
+                document.getElementById('totalCarbohydrate').textContent = totalCarbohydrateConsumed.toFixed(2);
+
+            });
+
+
+
+
+
+
+
     </script>
 </body>
 </html>
