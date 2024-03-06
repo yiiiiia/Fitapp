@@ -9,7 +9,8 @@ from .forms import ExerciseBookForm
 
 @login_required
 def dashboard(request):
-    return render(request, 'dashboard.html', {})
+    # return render(request, 'graph.html', {'username': 'Felicity'})
+    return render(request, 'dashboard.html', {'username': 'Felicity'})
 
 
 @login_required
@@ -23,3 +24,8 @@ def add_exercise(request):
     else:
         form = ExerciseBookForm()
     return render(request, 'add_exercise.html', {'form': form})
+
+
+@login_required
+def food_page(request):
+    return render(request, 'food_page.html')

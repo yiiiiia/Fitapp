@@ -25,8 +25,6 @@ def set_user_in_session(request, user):
 def login_required(func):
     def wrapper(request):
         if request.session.get('user_id'):
-            print('user has logged in, id: ' +
-                  str(request.session.get('user_id')))
             return func(request)
         else:
             return redirect('login')
