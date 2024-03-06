@@ -1,6 +1,7 @@
 from django.urls import path
 from .views import UserRelatedDataView, AddFoodEatenView, FoodListView, show_add_food_eaten_page
 from . import views
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('add_food/', views.add_food, name='add_food'),
@@ -13,5 +14,6 @@ urlpatterns = [
     path('metabolism_7days/', views.metabolism_7days, name='metabolism_7days'),
     path('food_daily/', views.food_daily, name='food_daily'),
     path('food_records/', views.food_records, name='food_records'),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
 
 ]
