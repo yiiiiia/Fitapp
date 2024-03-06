@@ -11,4 +11,7 @@ urlpatterns = [
     path('foodlist/', views.foodlist, name='foodlist'),
     path('metabolism/', views.metabolism_view, name='metabolism'),
     path('metabolism_7days/', views.metabolism_7days, name='metabolism_7days'),
+    path('food_daily/', views.food_daily, name='food_daily'),
+    path('food_records/', views.food_records, name='food_records'),
+
 ]
