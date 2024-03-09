@@ -14,6 +14,10 @@ from .forms import DailyMetabolismForm, FoodBookForm, FoodEatenForm
 from .models import DailyMetabolism, FoodBook, FoodEaten
 
 
+from datetime import timedelta
+from django.utils import timezone
+
+
 class FoodListView(APIView):
     def get(self, request):
         foods = FoodBook.objects.all()
@@ -78,3 +82,36 @@ def food_page(request):
     letters = string.digits
     q = ''.join(random.choice(letters) for i in range(10))
     return render(request, 'food_exercise.html', {'food_page': True, 'page_type': 'food', 'q': q, 'username': user.get_username()})
+
+
+
+def metabolism_view(request):
+    today = timezone.now().date()
+    metabolisms = DailyMetabolism.objects.filter(user=request.user, date=today).values('id', 'bmr', 'intake', 'exercise_metabolism', 'total')  # 获取所有记录的特定字段
+    metabolisms_list = list(metabolisms)  # 将QuerySet转换为列表
+    return JsonResponse(metabolisms_list, safe=False)
+
+def metabolism_7days(request):
+    #7天柱状图
+    today = timezone.now().date()
+    week_ago = today - timedelta(days=7)
+    metabolisms = DailyMetabolism.objects.filter(user=request.user, date__range=[week_ago, today]).values('date', 'bmr', 'intake', 'exercise_metabolism', 'total')
+    metabolisms_7dayslist = list(metabolisms)
+    return JsonResponse(metabolisms_7dayslist, safe=False)
+
+def food_daily(request):
+    #饼图的
+    if request.user.is_authenticated:
+        food_eaten = FoodEaten.objects.filter(user=request.user).values('food', 'amount',
+                                                                        'date')  # 假设FoodBook模型有一个'name'字段
+        return JsonResponse(list(food_eaten), safe=False)
+    return JsonResponse([], safe=False)
+
+
+
+def food_records(request):
+    if request.user.is_authenticated:
+        food_eaten_records = list(FoodEaten.objects.filter(user=request.user).select_related('food').order_by('-date').values('food__food_name', 'amount', 'date', 'food__calories_per_gram', 'food__protein_per_gram', 'food__fat_per_gram', 'food__carbohydrate_per_gram', 'food__other_per_gram'))
+        return JsonResponse({'food_eaten_records': food_eaten_records}, safe=False)
+    else:
+        return JsonResponse({'food_eaten_records': []})
