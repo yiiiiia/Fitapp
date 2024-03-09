@@ -1,6 +1,5 @@
 # views.py
 import logging
-from urllib import request
 
 from django.contrib.auth import authenticate,login
 from django.contrib.auth.hashers import make_password
@@ -25,12 +24,25 @@ def set_user_in_session(request, user):
 def login_required(func):
     def wrapper(request):
         if request.session.get('user_id'):
-            print('user has logged in, id: ' +
-                  str(request.session.get('user_id')))
             return func(request)
         else:
             return redirect('login')
     return wrapper
+
+
+def login_required(func):
+    def wrapper(request):
+        if request.session.get('user_id'):
+            return func(request)
+        else:
+            return redirect('login')
+    return wrapper
+
+
+def sign_out(request):
+    if request.session.get('user_id'):
+        del request.session['user_id']
+    return redirect('login')
 
 
 class LoginView(APIView):
@@ -88,7 +100,16 @@ class SignupView(APIView):
         return JsonResponse({'message': 'User created successfully'}, status=201)
 
 
-# implement for font-end validation
+@login_required
+def user_profile(request):
+    if request.method == 'GET':
+        user_id = request.session.get('user_id')
+        user = User.objects.get(id=user_id)
+        return render(request, 'profile.html', {'username': user.get_username(), 'email': user.email})
+    elif request.method == 'POST' or request.method == "PUT":
+        return JsonResponse({'msg': 'good'}, status=200)
+
+
 def check_username_email(request):
     username = request.GET.get('username')
     email = request.GET.get('email')
@@ -104,23 +125,3 @@ def check_username_email(request):
             return JsonResponse({'exists': False}, status=200)
     else:
         return JsonResponse({'error': 'invalid parameter'}, status=400)
-
-
-def update_profile(request):
-    return render(request, 'update_profile.html')
-
-
-class UserProfileUpdateView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def put(self, request, *args, **kwargs):
-        user_profile, created = UserProfile.objects.get_or_create(
-            user=request.user)
-        user_profile.gender = request.data.get('gender')
-        user_profile.age = request.data.get('age')
-        user_profile.height = request.data.get('height')
-        user_profile.weight = request.data.get('weight')
-        logger.error(user_profile.user)
-        user_profile.save()
-
-        return Response({'message': 'Profile updated successfully'}, status=200)

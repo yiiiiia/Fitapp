@@ -1,6 +1,229 @@
 {% extends 'base.html' %}
+
 {% load static %}
+
 {% block title %}Fit 35 Dashboard{% endblock %}
-{% block content %}
+
+{% block css-style %}
+<style>
+    body {
+        font-family: serif;
+    }
+
+    nav {
+        font-size: 20px;
+    }
+
+    .tab-link {
+        cursor: pointer;
+    }
+
+    a.level-item {
+        color: inherit;
+    }
+
+    a.is-active-level {
+        color: #3273dc;
+        cursor: default;
+    }
+
+    .graph-container {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+
+    .graph-labels {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+    }
+
+    .bar {
+        border-radius: 5px 5px 0 0;
+        width: 50px;
+        position: relative;
+    }
+
+    .bar:last-child {
+        margin-right: 0;
+    }
+
+    .bar-deficit {
+        position: absolute;
+        top: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: #333;
+    }
+
+    .bar-day {
+        margin-top: 5px;
+        text-align: center;
+        color: #333;
+        width: 60px;
+    }
+
+    .chart-wrap {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+    }
+
+    .pie-chart {
+        width: 300px;
+        height: 300px;
+        border-radius: 50%;
+        background-color: #fff;
+    }
+
+    .chart-info {
+        text-transform: capitalize;
+        font-size: 20px;
+    }
+
+    .chart-info ul {
+        padding: 0;
+        margin: 0;
+        list-style-type: none;
+    }
+
+    .chart-info ul li {
+        margin-bottom: 10px;
+        text-align: right;
+    }
+
+    .chart-info ul li span {
+        width: 30px;
+        height: 20px;
+        border-radius: 5px;
+        margin-left: 5px;
+        display: inline-block;
+    }
+</style>
 {% endblock %}
 
+{% block nav %}
+<nav class="level navbar">
+    <p class="level-item has-text-centered">
+        <img src="{% static 'boat.png' %}" alt="" style="height: 80px;">
+        <span class="is-family-primary">35 Fit</span>
+    </p>
+    <a class="level-item has-text-centered is-active-level">
+        DASHBOARD
+    </a>
+    <a class="level-item has-text-centered">
+        CALORIE QUERY
+    </a>
+    <a class="level-item has-text-centered">
+        EXPERT ARTICLES
+    </a>
+    <div class="navbar-item level-item has-dropdown is-hoverable">
+        <a class="navbar-link">
+            Hi! {{ username }}
+        </a>
+        <div class="navbar-dropdown">
+            <a href="{% url 'profile' %}" class="dropdown-item level-item">
+                Account & Profile
+            </a>
+            <a href="{% url 'signout' %}" class="dropdown-item level-item">
+                Sign Out
+            </a>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<section class="section block box">
+    <div class="columns has-text-centered">
+        <div class="column is-one-third">
+            <div class="columns is-multiline">
+                <div class="column is-full">
+                    <p>Exercise Metabolism<span class="ml-4">{{300}}</span></p>
+                </div>
+                <div class="column is-full">
+                    <p>Daily Basal Metabolism<span class="ml-4">{{400}}</span></p>
+                </div>
+            </div>
+        </div>
+        <div class="column is-one-third">
+            <div class="columns is-multiline">
+                <div class="column is-full">
+                    <p>Calories Taken<span class="ml-4">{{400}}</span></p>
+                </div>
+                <div class="column is-full">
+                    <p>Sum for Today<span class="ml-4">{{400}}</span></p>
+                </div>
+            </div>
+        </div>
+        <div class="column is-one-third">
+            <a href="{% url 'food_page' %}" class="button is-link">To Record</a>
+        </div>
+    </div>
+</section>
+<section class="block">
+    <div class="columns is-gapless">
+        <div id="calorie-bar" class="column is-half box">
+            <h5 class="title is-5 has-text-centered">Weekly Calorie Deficit Graph</h5>
+            <hr>
+            <div class="graph-container">
+                <template v-for="item in weeklyCalorieDeficits">
+                    <div class="bar" :style="barStyle(item.deficit)">
+                        <div class="bar-deficit">${ item.deficit }$</div>
+                    </div>
+                </template>
+            </div>
+            <div class="graph-labels">
+                <template v-for="item in weeklyCalorieDeficits">
+                    <div class="bar-day">${ item.day }$</div>
+                </template>
+            </div>
+        </div>
+        <div id="calorie-pie" class="column is-half box">
+            <h5 class="title is-5 has-text-centered">Today's Nutrition Intake: ${ today }$ </h5>
+            <hr>
+            <div class="chart-wrap">
+                <figure class="pie-chart" :style="pieStyle()"></figure>
+                <div class="chart-info">
+                    <ul>
+                        <li>Fat ${ intake.fat }$%<span style="background-color: #f7f25e;"></span></li>
+                        <li>Carbohydrate ${ intake.carbohydrate }$%<span style="background-color: #67f594;"></span></li>
+                        <li>Protein ${ intake.protein }$%<span style="background-color: #cf5351;"></span></li>
+                        <li>Other ${ intake.other }$%<span style="background-color: #166778;"></span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="block">
+    <div class="columns is-gapless">
+        <div id="favourite-articles" class="column is-half box">
+            <h5 class="title is-5 has-text-centered">Favourite articles</h5>
+            <ul v-for="article in articles">
+                <li>
+                    <div class="card">
+                        <header class="card-header">
+                            <p class="card-header-title">
+                                ${ article.title }$
+                            </p>
+                        </header>
+                        <div class="card-content">
+                            <div class="content">
+                                ${ article.content }$
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="column is-half box">
+        </div>
+    </div>
+</section>
+<script src="{% static 'dashboard.js' %}"></script>
+{% endblock %}
+
+{% block footer %}{% endblock %}
