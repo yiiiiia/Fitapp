@@ -7,11 +7,24 @@
 {% block css-style %}
 <style>
     body {
-        font-family: monospace;
+        font-family: serif;
     }
 
     nav {
         font-size: 20px;
+    }
+
+    .tab-link {
+        cursor: pointer;
+    }
+
+    a.level-item {
+        color: inherit;
+    }
+
+    a.is-active-level {
+        color: #3273dc;
+        cursor: default;
     }
 
     .graph-container {
@@ -28,9 +41,8 @@
     }
 
     .bar {
-        background-color: #3273dc;
         border-radius: 5px 5px 0 0;
-        width: 60px;
+        width: 50px;
         position: relative;
     }
 
@@ -38,7 +50,7 @@
         margin-right: 0;
     }
 
-    .bar-text-1 {
+    .bar-deficit {
         position: absolute;
         top: -20px;
         left: 50%;
@@ -46,7 +58,7 @@
         color: #333;
     }
 
-    .bar-text {
+    .bar-day {
         margin-top: 5px;
         text-align: center;
         color: #333;
@@ -96,26 +108,26 @@
 <nav class="level navbar">
     <p class="level-item has-text-centered">
         <img src="{% static 'boat.png' %}" alt="" style="height: 80px;">
-        <span class="is-family-primary has-text-weight-bold">35 Fit</span>
+        <span class="is-family-primary">35 Fit</span>
     </p>
-    <p class="level-item has-text-centered">
+    <a class="level-item has-text-centered is-active-level">
         DASHBOARD
-    </p>
-    <p class="level-item has-text-centered">
+    </a>
+    <a class="level-item has-text-centered">
         CALORIE QUERY
-    </p>
-    <p class="level-item has-text-centered">
+    </a>
+    <a class="level-item has-text-centered">
         EXPERT ARTICLES
-    </p>
+    </a>
     <div class="navbar-item level-item has-dropdown is-hoverable">
         <a class="navbar-link">
-            Welcome back, {{ username }}
+            Hi! {{ username }}
         </a>
         <div class="navbar-dropdown">
-            <a href="#" class="dropdown-item level-item">
+            <a href="{% url 'profile' %}" class="dropdown-item level-item">
                 Account & Profile
             </a>
-            <a href="#" class="dropdown-item level-item">
+            <a href="{% url 'signout' %}" class="dropdown-item level-item">
                 Sign Out
             </a>
         </div>
@@ -124,9 +136,9 @@
 {% endblock %}
 
 {% block content %}
-<section class="section has-background-primary block">
+<section class="section block box">
     <div class="columns has-text-centered">
-        <div class="column is-one-third has-text-weight-bold">
+        <div class="column is-one-third">
             <div class="columns is-multiline">
                 <div class="column is-full">
                     <p>Exercise Metabolism<span class="ml-4">{{300}}</span></p>
@@ -136,7 +148,7 @@
                 </div>
             </div>
         </div>
-        <div class="column is-one-third has-text-weight-bold">
+        <div class="column is-one-third">
             <div class="columns is-multiline">
                 <div class="column is-full">
                     <p>Calories Taken<span class="ml-4">{{400}}</span></p>
@@ -147,57 +159,39 @@
             </div>
         </div>
         <div class="column is-one-third">
-            <button class="button is-link is-medium">To Record</button>
+            <a href="{% url 'food_page' %}" class="button is-link">To Record</a>
         </div>
     </div>
 </section>
 <section class="block">
     <div class="columns is-gapless">
-        <div class="column is-half box">
+        <div id="calorie-bar" class="column is-half box">
             <h5 class="title is-5 has-text-centered">Weekly Calorie Deficit Graph</h5>
             <hr>
             <div class="graph-container">
-                <div class="bar" style="height: 200px;">
-                    <div class="bar-text-1">200</div>
-                </div>
-                <div class="bar" style="height: 150px;"></div>
-                <div class="bar" style="height: 100px;"></div>
-                <div class="bar" style="height: 250px;"></div>
-                <div class="bar" style="height: 200px;"></div>
-                <div class="bar" style="height: 150px;"></div>
-                <div class="bar" style="height: 250px;"></div>
+                <template v-for="item in weeklyCalorieDeficits">
+                    <div class="bar" :style="barStyle(item.deficit)">
+                        <div class="bar-deficit">${ item.deficit }$</div>
+                    </div>
+                </template>
             </div>
             <div class="graph-labels">
-                <div class="bar-text">Mon, 2024-03-10</div>
-                <div class="bar-text">Tue</div>
-                <div class="bar-text">Wed</div>
-                <div class="bar-text">Thur</div>
-                <div class="bar-text">Fir</div>
-                <div class="bar-text">Sat</div>
-                <div class="bar-text">Sun</div>
+                <template v-for="item in weeklyCalorieDeficits">
+                    <div class="bar-day">${ item.day }$</div>
+                </template>
             </div>
         </div>
-        <div class="column is-half box">
-            <h5 class="title is-5 has-text-centered">Today Nutrition Intake</h5>
+        <div id="calorie-pie" class="column is-half box">
+            <h5 class="title is-5 has-text-centered">Today's Nutrition Intake: ${ today }$ </h5>
             <hr>
             <div class="chart-wrap">
-                <figure class="pie-chart" style="background:
-            conic-gradient(from 0deg,
-                    #f7f25e 0,
-                    #f7f25e calc(15%),
-                    #67f594 calc(15%),
-                    #67f594 calc(15% + 45%),
-                    #cf5351 calc(60%),
-                    #cf5351 calc(60% + 35%),
-                    #166778 calc(95%),
-                    #166778 calc(100%)
-            )"></figure>
+                <figure class="pie-chart" :style="pieStyle()"></figure>
                 <div class="chart-info">
                     <ul>
-                        <li>Fat 15%<span style="background-color: #f7f25e;"></span></li>
-                        <li>Carbohydrate 45%<span style="background-color: #67f594;"></span></li>
-                        <li>Protein 35%<span style="background-color: #cf5351;"></span></li>
-                        <li>Other 5%<span style="background-color: #166778;"></span></li>
+                        <li>Fat ${ intake.fat }$%<span style="background-color: #f7f25e;"></span></li>
+                        <li>Carbohydrate ${ intake.carbohydrate }$%<span style="background-color: #67f594;"></span></li>
+                        <li>Protein ${ intake.protein }$%<span style="background-color: #cf5351;"></span></li>
+                        <li>Other ${ intake.other }$%<span style="background-color: #166778;"></span></li>
                     </ul>
                 </div>
             </div>
@@ -206,51 +200,22 @@
 </section>
 <section class="block">
     <div class="columns is-gapless">
-        <div class="column is-half box">
-            <ul>
+        <div id="favourite-articles" class="column is-half box">
+            <h5 class="title is-5 has-text-centered">Favourite articles</h5>
+            <ul v-for="article in articles">
                 <li>
                     <div class="card">
                         <header class="card-header">
                             <p class="card-header-title">
-                                Article 1
+                                ${ article.title }$
                             </p>
                         </header>
                         <div class="card-content">
                             <div class="content">
-                                Lorem ipsum leo risus, porta ac consectetur ac, vestibulum at eros. Donec id elit non mi
+                                ${ article.content }$
                             </div>
                         </div>
                     </div>
-                </li>
-                <li>
-                    <div class="card">
-                        <header class="card-header">
-                            <p class="card-header-title">
-                                Article 2
-                            </p>
-                        </header>
-                        <div class="card-content">
-                            <div class="content">
-                                Lorem ipsum leo risus, porta ac consectetur ac, vestibulum at eros. Donec id elit non mi
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                <li>
-                    <div class="card">
-                        <header class="card-header">
-                            <p class="card-header-title">
-                                Article 3
-                            </p>
-                        </header>
-                        <div class="card-content">
-                            <div class="content">
-                                Lorem ipsum leo risus, porta ac consectetur ac, vestibulum at eros. Donec id elit non mi
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                <li>
                 </li>
             </ul>
         </div>
@@ -258,7 +223,7 @@
         </div>
     </div>
 </section>
-<script type="module" src="{% static 'dashboard.js' %}"></script>
+<script src="{% static 'dashboard.js' %}"></script>
 {% endblock %}
 
 {% block footer %}{% endblock %}

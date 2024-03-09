@@ -1,7 +1,7 @@
 import logging
 
+from django.contrib.auth.models import User
 from django.shortcuts import redirect, render
-
 from UserProfile.views import login_required
 
 from .forms import ExerciseBookForm
@@ -9,8 +9,10 @@ from .forms import ExerciseBookForm
 
 @login_required
 def dashboard(request):
-    # return render(request, 'graph.html', {'username': 'Felicity'})
-    return render(request, 'dashboard.html', {'username': 'Felicity'})
+    user_id = request.session.get('user_id')
+    user = User.objects.get(id=user_id)
+    print(user)
+    return render(request, 'dashboard.html', {'username': user.get_username()})
 
 
 @login_required
@@ -27,5 +29,5 @@ def add_exercise(request):
 
 
 @login_required
-def food_page(request):
-    return render(request, 'food_page.html')
+def exercise_page(request):
+    return render(request, 'food_exercise.html')

@@ -1,42 +1,108 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // Functions to open and close a modal
-    function openModal($el) {
-        $el.classList.add('is-active');
-    }
+const { createApp } = Vue;
 
-    function closeModal($el) {
-        $el.classList.remove('is-active');
-    }
-
-    function closeAllModals() {
-        (document.querySelectorAll('.modal') || []).forEach(($modal) => {
-            closeModal($modal);
-        });
-    }
-
-    // Add a click event on buttons to open a specific modal
-    (document.querySelectorAll('.js-modal-trigger') || []).forEach(($trigger) => {
-        const modal = $trigger.dataset.target;
-        const $target = document.getElementById(modal);
-
-        $trigger.addEventListener('click', () => {
-            openModal($target);
-        });
-    });
-
-    // Add a click event on various child elements to close the parent modal
-    (document.querySelectorAll('.modal-background, .modal-close, .modal-card-head .delete, .modal-card-foot .button') || []).forEach(($close) => {
-        const $target = $close.closest('.modal');
-
-        $close.addEventListener('click', () => {
-            closeModal($target);
-        });
-    });
-
-    // Add a keyboard event to close all modals
-    document.addEventListener('keydown', (event) => {
-        if (event.key === "Escape") {
-            closeAllModals();
+// @cardType: 'food' or 'exercise
+function loadCards(cardType, page = 1, pageSize = 12, searchBy = '') {
+    // TODO backend API
+    // mock data
+    return [
+        {
+            id: 0,
+            image: '/static/grocery.jpeg',
+            name: 'Pasta',
+            category: 'Carbohydrate',
+            calorie: 130
+        },
+        {
+            id: 1,
+            image: '/static/grocery.jpeg',
+            name: 'Tomato',
+            category: 'Vegetable',
+            calorie: 20
+        },
+        {
+            id: 2,
+            image: '/static/grocery.jpeg',
+            name: 'Chicken Breast',
+            category: 'Protein',
+            calorie: 175
         }
-    });
-});
+    ]
+}
+
+// @recordType: 'food' or 'exercise
+// @entity: id of the food or exercise
+function saveRecord(recordType, entityId, quantity) {
+    let today = new Date()
+    return 'ok'
+    // TODO backend API
+}
+
+const foodExerciseApp = createApp({
+    mounted() {
+        let pageType = this.$refs.root.getAttribute('page_type')
+        this.pageType = pageType
+        if (pageType == 'food') {
+            this.inputPlaceholder = 'unit: g'
+            this.searchPlaceholder = 'Search food'
+        } else if (pageType == 'exercise') {
+            this.inputPlaceholder = 'unit: minute'
+            this.searchPlaceholder = 'Search exercise'
+        }
+        this.loadCards()
+    },
+    data() {
+        return {
+            pageType: '',
+            cards: [],
+            exerciseCards: [],
+            recordItem: {},
+            inputErr: '',
+            quantityPlaceholder: '',
+            searchPlaceholder: '',
+            saveQuantity: '',
+            searchInput: '',
+        }
+    },
+    methods: {
+        searchByName() {
+            if (this.searchInput != '') {
+                this.cards = loadCards(this.pageType, 1, 12, this.searchInput)
+            }
+        },
+        loadCards() {
+            this.cards = loadCards(this.pageType)
+        },
+        activateModal(item) {
+            this.recordItem = item
+            this.saveQuantity = ''
+            this.$refs.modal.classList.add('is-active')
+        },
+        deactivateModal() {
+            this.$refs.modal.classList.remove('is-active')
+        },
+        clearErr() {
+            this.$refs.num_input.classList.remove('is-danger')
+            this.inputErr = ''
+        },
+        submit() {
+            if (this.saveQuantity == '') {
+                this.$refs.num_input.classList.add('is-danger')
+                this.inputErr = (this.pageType == 'food' ? 'Quantity' : 'Time') + ' is required'
+                return
+            }
+            if (isNaN(this.saveQuantity)) {
+                this.$refs.num_input.classList.add('is-danger')
+                this.inputErr = 'not a number'
+                return
+            }
+            if (saveRecord(this.pageType, this.recordItem.id, parseInt(this.saveQuantity, 10))) {
+                this.deactivateModal()
+            } else {
+                alert('Network error')
+            }
+        }
+    },
+    compilerOptions: {
+        delimiters: ["${", "}$"]
+    }
+}).mount('#food_exercise_app')

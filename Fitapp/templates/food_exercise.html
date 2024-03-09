@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}Fit 35 Food Page{% endblock %}
+
+{% block css-style %}
+<style>
+    .card-content {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    a.level-item {
+        color: inherit;
+    }
+
+    a.is-active-level {
+        color: #3273dc;
+        cursor: default;
+    }
+</style>
+{% endblock %}
+
+{% block nav %}
+<nav class="level navbar">
+    <p class="level-item has-text-centered">
+        <img src="{% static 'boat.png' %}" alt="" style="height: 80px;">
+        <span class="is-family-primary">35 Fit</span>
+    </p>
+    <a class="level-item has-text-centered">
+        DASHBOARD
+    </a>
+    <a class="level-item has-text-centered is-active-level">
+        CALORIE QUERY
+    </a>
+    <a class="level-item has-text-centered">
+        EXPERT ARTICLES
+    </a>
+    <div class="navbar-item level-item has-dropdown is-hoverable">
+        <a class="navbar-link">
+            Hi! {{ username }}
+        </a>
+        <div class="navbar-dropdown">
+            <a href="{% url 'profile' %}" class="dropdown-item level-item">
+                Account & Profile
+            </a>
+            <a href="{% url 'signout' %}" class="dropdown-item level-item">
+                Sign Out
+            </a>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<section id="food_exercise_app">
+    <div class="box">
+        <div class="tabs is-medium is-boxed">
+            <ul>
+                {% if food_page %}
+                <li class="is-active"><a>Food Calories</a></li>
+                <li><a>Exercise Calories</a></li>
+                {% else %}
+                <li><a>Food Calories</a></li>
+                <li class="is-active"><a>Exercise Calories</a></li>
+                {% endif %}
+            </ul>
+        </div>
+        <div class="search">
+            <div class="field">
+                <div class="control has-icons-right">
+                    <input class="input" type="text" v-bind:placeholder="searchPlaceholder" @keyup.enter="searchByName"
+                        v-model.trim="searchInput">
+                    <span class="icon is-small is-right">
+                        <i class="fas fa-search"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="box">
+        <div class="columns is-multiline" ref="root" page_type="{{ page_type }}">
+            <template v-for="item in cards">
+                <div class="column is-one-quarter">
+                    <div class="card">
+                        <div class="card-image">
+                            <figure class="image is-3by2">
+                                <img v-bind:src="item.image" alt="{% static 'grocery.jpeg' %}">
+                            </figure>
+                        </div>
+                        <div class="card-content">
+                            <div class="food_exercise_content">
+                                <h3 class="subtitle is-3">${ item.name }$</h3>
+                                <div class="describe">
+                                    <div v-if="pageType == 'food'">
+                                        <p>${ item.category }$</p>
+                                        <p>Categories: ${ item.calorie }$ per 100g</p>
+                                    </div>
+                                    <p v-else>Categories: ${ item.categories }$ per minute</p>
+                                </div>
+                            </div>
+                            <span class="icon" @click="activateModal(item)" style="cursor: pointer">
+                                <i class="fas fas fa-2x fa-plus"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+        <div id="food_exercise_input" class="modal" ref="modal">
+            <div class="modal-background" @click="deactivateModal"></div>
+            <div class="modal-content">
+                <div class="card">
+                    <header class="card-header">
+                        <p class="card-header-title">
+                            <span v-if="pageType == 'food'">
+                                Record food
+                            </span>
+                            <span v-else>Record exercise</span>
+                        </p>
+                    </header>
+                    <div class="card-image">
+                        <figure class="image is-3by2">
+                            <img v-bind:src="recordItem.image" alt="">
+                        </figure>
+                    </div>
+                    <div class="card-content">
+                        <div class="content">
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td v-if="pageType == 'food'">Food name</td>
+                                        <td v-else>Exercise name</td>
+                                        <td>${ recordItem.name }$</td>
+                                    </tr>
+                                    <tr>
+                                        <td v-if="pageType == 'food'">Quantity</td>
+                                        <td v-else>Time</td>
+                                        <td>
+                                            <div class="control field">
+                                                <input class="input" ref="num_input" type="text"
+                                                    v-bind:placeholder="quantityPlaceholder" @focus="clearErr"
+                                                    v-model.trim="saveQuantity">
+                                                <p v-if="inputErr.length > 0" class="help is-danger">${ inputErr }$</p>
+                                            </div>
+                                            <div class="control field">
+                                                <button class="button is-link" @click="submit">Save</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="modal-close is-large" aria-label="close" @click="deactivateModal"></button>
+        </div>
+    </div>
+    <nav class="pagination is-centered block" role="navigation" aria-label="pagination">
+        <ul class="pagination-list">
+            <li><a class="pagination-link is-current">1</a></li>
+            <li><a class="pagination-link">2</a></li>
+            <li><a class="pagination-link">3</a></li>
+            <li><span class="pagination-ellipsis">&hellip;</span></li>
+            <li><a class="pagination-link">15</a></li>
+        </ul>
+    </nav>
+</section>
+
+<script src="{% static 'food_exercise.js' %}?q={{q}}"></script>
+
+{% endblock %}
+
+{% block footer %}{% endblock %}
