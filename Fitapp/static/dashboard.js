@@ -12,7 +12,7 @@ function parseDate(date) {
 }
 
 function weekDayName(day) {
-    if (day == 0) {
+    if (day == 7) {
         return "Sun"
     }
     if (day == 1) {
@@ -40,8 +40,11 @@ function getDaysOfThisWeek() {
     const today = new Date()
     let date = today.getDate()
     let weekDay = today.getDay()
+    if (weekDay == 0) {
+        weekDay = 7
+    }
     let result = []
-    for (let i = weekDay; i >= 0; --i) {
+    for (let i = weekDay; i >= 1; --i) {
         today.setDate(date - i)
         result.push(parseDate(today))
     }
@@ -90,7 +93,7 @@ const barApp = createApp({
         },
         loadCalorieDeficitThisWeek() {
             let daysOfThisWeek = getDaysOfThisWeek()
-            let index = 0;
+            let index = 1;
             for (let day in daysOfThisWeek) {
                 let deficit = getCalorieDeficitByDate(day)
                 this.weeklyCalorieDeficits.push({ 'day': weekDayName(index++), 'deficit': deficit })

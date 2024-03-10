@@ -1,18 +1,11 @@
-import logging
+import random
+import string
 
 from django.contrib.auth.models import User
 from django.shortcuts import redirect, render
 from UserProfile.views import login_required
 
 from .forms import ExerciseBookForm
-
-
-@login_required
-def dashboard(request):
-    user_id = request.session.get('user_id')
-    user = User.objects.get(id=user_id)
-    print(user)
-    return render(request, 'dashboard.html', {'username': user.get_username()})
 
 
 @login_required

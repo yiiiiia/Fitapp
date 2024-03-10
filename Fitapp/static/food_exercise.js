@@ -42,10 +42,10 @@ const foodExerciseApp = createApp({
         let pageType = this.$refs.root.getAttribute('page_type')
         this.pageType = pageType
         if (pageType == 'food') {
-            this.inputPlaceholder = 'unit: g'
+            this.quantityPlaceholder = 'unit: g'
             this.searchPlaceholder = 'Search food'
         } else if (pageType == 'exercise') {
-            this.inputPlaceholder = 'unit: minute'
+            this.quantityPlaceholder = 'unit: minute'
             this.searchPlaceholder = 'Search exercise'
         }
         this.loadCards()

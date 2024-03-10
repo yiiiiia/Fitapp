@@ -6,14 +6,6 @@
 
 {% block css-style %}
 <style>
-    body {
-        font-family: serif;
-    }
-
-    nav {
-        font-size: 20px;
-    }
-
     .tab-link {
         cursor: pointer;
     }
@@ -113,7 +105,7 @@
     <a class="level-item has-text-centered is-active-level">
         DASHBOARD
     </a>
-    <a class="level-item has-text-centered">
+    <a href="{% url 'food_page' %}" class="level-item has-text-centered">
         CALORIE QUERY
     </a>
     <a class="level-item has-text-centered">
@@ -141,20 +133,20 @@
         <div class="column is-one-third">
             <div class="columns is-multiline">
                 <div class="column is-full">
-                    <p>Exercise Metabolism<span class="ml-4">{{300}}</span></p>
+                    <p>Exercise Metabolism<span class="ml-4">{{ exercise_metabolism }}</span></p>
                 </div>
                 <div class="column is-full">
-                    <p>Daily Basal Metabolism<span class="ml-4">{{400}}</span></p>
+                    <p>Daily Basal Metabolism<span class="ml-4">{{ bmr }}</span></p>
                 </div>
             </div>
         </div>
         <div class="column is-one-third">
             <div class="columns is-multiline">
                 <div class="column is-full">
-                    <p>Calories Taken<span class="ml-4">{{400}}</span></p>
+                    <p>Calories Taken<span class="ml-4">{{ intake }}</span></p>
                 </div>
                 <div class="column is-full">
-                    <p>Sum for Today<span class="ml-4">{{400}}</span></p>
+                    <p>Sum for Today<span class="ml-4">{{ total }}</span></p>
                 </div>
             </div>
         </div>
@@ -223,7 +215,7 @@
         </div>
     </div>
 </section>
-<script src="{% static 'dashboard.js' %}"></script>
+<script src="{% static 'dashboard.js' %}?q={{ q }}"></script>
 {% endblock %}
 
 {% block footer %}{% endblock %}

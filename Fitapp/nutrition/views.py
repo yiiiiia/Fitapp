@@ -1,21 +1,17 @@
 import random
 import string
+from datetime import timedelta
 
 from django.contrib.auth.models import User
 from django.http import JsonResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import render
 from django.utils import timezone
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from UserProfile.views import login_required
 
-from .forms import DailyMetabolismForm, FoodBookForm, FoodEatenForm
 from .models import DailyMetabolism, FoodBook, FoodEaten
-
-
-from datetime import timedelta
-from django.utils import timezone
 
 
 class FoodListView(APIView):
@@ -23,10 +19,6 @@ class FoodListView(APIView):
         foods = FoodBook.objects.all()
         data = [{"id": food.id, "name": food.food_name} for food in foods]
         return Response(data)
-
-
-def show_add_food_eaten_page(request):
-    return render(request, 'add_food_eaten.html')
 
 
 class AddFoodEatenView(APIView):
@@ -63,16 +55,22 @@ class UserRelatedDataView(APIView):
         })
 
 
-def add_food(request):
-    print("进入了 add_food 视图")
-    if request.method == 'POST':
-        form = FoodBookForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('some_view_name')
-    else:
-        form = FoodBookForm()
-    return render(request, 'add_food.html', {'form': form})
+@login_required
+def dashboard(request):
+    user_id = request.session.get('user_id')
+    user = User.objects.get(id=user_id)
+    letters = string.digits
+    # TODO get metabolism related data
+    q = ''.join(random.choice(letters) for i in range(10))
+    ctx = {
+        'username': user.get_username(),
+        'exercise_metabolism': 400,
+        'bmr': 150,
+        'intake': 200,
+        'total': 200 - 400 - 150,
+        'q': q
+    }
+    return render(request, 'dashboard.html', ctx)
 
 
 @login_required
@@ -84,23 +82,26 @@ def food_page(request):
     return render(request, 'food_exercise.html', {'food_page': True, 'page_type': 'food', 'q': q, 'username': user.get_username()})
 
 
-
 def metabolism_view(request):
     today = timezone.now().date()
-    metabolisms = DailyMetabolism.objects.filter(user=request.user, date=today).values('id', 'bmr', 'intake', 'exercise_metabolism', 'total')  # 获取所有记录的特定字段
+    metabolisms = DailyMetabolism.objects.filter(user=request.user, date=today).values(
+        'id', 'bmr', 'intake', 'exercise_metabolism', 'total')  # 获取所有记录的特定字段
     metabolisms_list = list(metabolisms)  # 将QuerySet转换为列表
     return JsonResponse(metabolisms_list, safe=False)
 
+
 def metabolism_7days(request):
-    #7天柱状图
+    # 7天柱状图
     today = timezone.now().date()
     week_ago = today - timedelta(days=7)
-    metabolisms = DailyMetabolism.objects.filter(user=request.user, date__range=[week_ago, today]).values('date', 'bmr', 'intake', 'exercise_metabolism', 'total')
+    metabolisms = DailyMetabolism.objects.filter(user=request.user, date__range=[
+                                                 week_ago, today]).values('date', 'bmr', 'intake', 'exercise_metabolism', 'total')
     metabolisms_7dayslist = list(metabolisms)
     return JsonResponse(metabolisms_7dayslist, safe=False)
 
+
 def food_daily(request):
-    #饼图的
+    # 饼图的
     if request.user.is_authenticated:
         food_eaten = FoodEaten.objects.filter(user=request.user).values('food', 'amount',
                                                                         'date')  # 假设FoodBook模型有一个'name'字段
@@ -108,10 +109,10 @@ def food_daily(request):
     return JsonResponse([], safe=False)
 
 
-
 def food_records(request):
     if request.user.is_authenticated:
-        food_eaten_records = list(FoodEaten.objects.filter(user=request.user).select_related('food').order_by('-date').values('food__food_name', 'amount', 'date', 'food__calories_per_gram', 'food__protein_per_gram', 'food__fat_per_gram', 'food__carbohydrate_per_gram', 'food__other_per_gram'))
+        food_eaten_records = list(FoodEaten.objects.filter(user=request.user).select_related('food').order_by('-date').values('food__food_name', 'amount',
+                                  'date', 'food__calories_per_gram', 'food__protein_per_gram', 'food__fat_per_gram', 'food__carbohydrate_per_gram', 'food__other_per_gram'))
         return JsonResponse({'food_eaten_records': food_eaten_records}, safe=False)
     else:
         return JsonResponse({'food_eaten_records': []})

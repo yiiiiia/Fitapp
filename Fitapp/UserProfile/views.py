@@ -1,25 +1,14 @@
-# views.py
-import logging
+import random
+import string
 
-from django.contrib.auth import authenticate,login
+from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import UserProfile
-
-logger = logging.getLogger(__name__)
-
-
-def set_user_in_session(request, user):
-    request.session['user_id'] = user.id
-    request.session.set_expiry(24 * 3600)
-
 
 def login_required(func):
     def wrapper(request):
@@ -30,15 +19,7 @@ def login_required(func):
     return wrapper
 
 
-def login_required(func):
-    def wrapper(request):
-        if request.session.get('user_id'):
-            return func(request)
-        else:
-            return redirect('login')
-    return wrapper
-
-
+@login_required
 def sign_out(request):
     if request.session.get('user_id'):
         del request.session['user_id']
@@ -50,23 +31,24 @@ class LoginView(APIView):
         if request.session.get('user_id'):
             return redirect('dashboard')
         else:
-            return render(request, 'login.html')
+            letters = string.digits
+            q = ''.join(random.choice(letters) for i in range(10))
+            return render(request, 'login.html', {'q': q})
 
     def post(self, request, *args, **kwargs):
         username = request.data.get('username')
         password = request.data.get('password')
         user = authenticate(username=username, password=password)
         if user:
-            set_user_in_session(request, user)
+            request.session['user_id'] = user.id
+            request.session.set_expiry(24 * 3600)
             next_page = reverse('dashboard')
             return JsonResponse({'next_page': next_page}, status=200)
         else:
-            if User.objects.filter(username=username).exists():
-                logger.error("User exists, but authentication failed.")
-                return JsonResponse({'error': 'incorrect password'}, status=404)
+            if not User.objects.filter(username=username).exists():
+                return JsonResponse({'err_msg': 'user does not exist', 'err_code': 1}, status=404)
             else:
-                logger.error("User does not exist.")
-                return JsonResponse({'error': 'user not exist'}, status=404)
+                return JsonResponse({'err_msg': 'incorrect password', 'err_code': 2}, status=404)
 
 
 class SignupView(APIView):
