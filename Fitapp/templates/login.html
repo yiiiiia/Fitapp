@@ -1,6 +1,14 @@
 {% extends 'base.html' %}
+
 {% load static %}
-{% block title %}Login Fit 35{% endblock %}
+
+{% block title %}
+Login Fit 35
+{% endblock %}
+
+{% block nav %}
+{% endblock %}
+
 {% block content %}
 <section class="hero is-primary is-fullheight">
     <div class="hero-body">
@@ -17,7 +25,7 @@
                                 <span class="icon is-small is-left">
                                     <i class="fas fa-user"></i>
                                 </span>
-                                <p v-if="errCode == 1" class="help is-danger">user does not exist</p>
+                                <p v-if="errcode == 1" class="help is-danger">user not exist</p>
                             </div>
                         </div>
                         <div class="field">
@@ -28,7 +36,7 @@
                                 <span class="icon is-small is-left">
                                     <i class="fas fa-lock"></i>
                                 </span>
-                                <p v-if="errCode == 2" class="help is-danger">incorrect password</p>
+                                <p v-if="errcode == 2" class="help is-danger">incorrect password</p>
                             </div>
                         </div>
                         <div class="field">

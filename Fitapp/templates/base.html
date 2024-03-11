@@ -27,17 +27,90 @@
         }
     </script>
 
+    {% block extra_resources %}
+    {% endblock %}
+
     {% block css-style %}
     {% endblock css-style %}
 </head>
 
 <body>
     {% block nav %}
+    <nav class="level navbar">
+        <p class="level-item has-text-centered">
+            <img src="{% static 'logo.png' %}" alt="" style="height: 80px;">
+        </p>
+        <a href="{% url 'dashboard' %}" class="level-item has-text-centered">
+            DASHBOARD
+        </a>
+        <a href="{% url 'food_page' %}" class="level-item has-text-centered">
+            CALORIE QUERY
+        </a>
+        <a href="#" class="level-item has-text-centered">
+            EXPERT ARTICLES
+        </a>
+        <div class="navbar-item level-item has-dropdown is-hoverable">
+            <a class="navbar-link">
+                Hi! {{ username }}
+            </a>
+            <div class="navbar-dropdown">
+                <a href="{% url 'profile' %}" class="dropdown-item level-item">
+                    Account & Profile
+                </a>
+                <a id="signout-link" href="#" class="dropdown-item level-item">
+                    Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var signoutLink = document.getElementById('signout-link');
+
+            signoutLink.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                fetch('/userprofile/signout/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'same-origin'
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            window.location.href = '/userprofile/login/';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            });
+
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    let cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        let cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+        });
+    </script>
     {% endblock nav %}
+
     <main>
         {% block content %}
         {% endblock content %}
     </main>
+
     <footer>
         {% block footer %}
         <p>© 2024 My Django Project. All rights reserved.</p>

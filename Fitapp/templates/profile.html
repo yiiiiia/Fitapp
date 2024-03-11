@@ -7,71 +7,141 @@
 
 {% block css-style %}
 <style>
+    span.unit {
+        margin-left: 5px;
+    }
+
+    a.color_normal {
+        color: inherit;
+    }
 </style>
+{% endblock %}
+
+{% block nav %}
 {% endblock %}
 
 {% block content %}
 <div class="container">
     <div class="columns is-vcentered">
-        <div class="column is-three-fifths">
+        <div class="column is-half">
             <h3 class="title is-3">Account & Profile</h3>
         </div>
         <div class="column">
-            <h5 class="subtitle is-5">Username: {{ username }}</h5>
+            <span class="icon-text">
+                <span class="icon">
+                    <i class="fas fa-solid fa-user"></i>
+                </span>
+                <span>{{ username }}</span>
+            </span>
         </div>
         <div class="column">
-            <h5 class="subtitle is-5">Email: {{ email }}</h5>
+            <span class="icon-text">
+                <span class="icon">
+                    <i class="fas fa-solid fa-envelope"></i>
+                </span>
+                <span>{{ email }}</span>
+            </span>
+        </div>
+        <div class="column">
+            <span class="icon-text">
+                <span class="icon">
+                    <i class="fas fa-home"></i>
+                </span>
+                <a class="color_normal" href="{% url 'dashboard' %}">Dashboard</a>
+            </span>
         </div>
         <hr>
     </div>
     <hr>
 </div>
-<div class="container">
+<div id="app-profile" class="container">
     <div class="columns is-centered">
-        <div class="column is-half">
-            <div class="columns">
-                <div class="column is-full">
-                    <div class="field">
-                        <label class="label">Gender</label>
-                        <div class="control">
-                            <div class="select">
-                                <select>
-                                    <option>Male</option>
-                                    <option>Female</option>
-                                    <option>Other</option>
-                                </select>
-                            </div>
-                        </div>
+        <div class="column is-half" ref="profile-table">
+            <div class="card">
+                <div class="card-content">
+                    <div class="content">
+                        <table class="table is-full-width">
+                            <tbody>
+                                <tr>
+                                    <td>Gender</td>
+                                    <td><span ref="gender">{{ profile.gender }}</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Age</td>
+                                    <td><span ref="age">{{ profile.age }}</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Height</td>
+                                    <td><span ref="height">{{ profile.height }}</span><span class="unit">cm</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Weight</td>
+                                    <td><span ref="weight">{{ profile.weight }}</span><span class="unit">kg</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-                <div class="column">
-                    <span class="icon is-large">
-                        <i class="fas fa-edit"></i>
-                    </span>
-                </div>
+                <footer class="card-footer">
+                    <a href="#" class="card-footer-item" @click="edit">Edit</a>
+                </footer>
             </div>
-            <div class="field">
-                <label class="label">Age</label>
-                <div class="control has-icons-left has-icons-right">
-                    <input class="input" type="text" placeholder="Text input" value="">
-                </div>
-            </div>
-            <div class="field">
-                <label class="label">Height</label>
-                <div class="control has-icons-left has-icons-right">
-                    <input class="input" type="text" placeholder="Text input" value="">
-                </div>
-            </div>
-            <div class="field">
-                <label class="label">Weight</label>
-                <div class="control has-icons-left has-icons-right">
-                    <input class="input" type="text" placeholder="Text input" value="">
+        </div>
+        <div class="column is-half is-hidden" ref="profile-form">
+            <div class="card">
+                <div class="card-content">
+                    <form class="block" @submit.prevent="submit">
+                        {% csrf_token %}
+                        <div class="field">
+                            <label class="label">Gender</label>
+                            <div class="control">
+                                <div class="select">
+                                    <select v-model="form.gender">
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Age</label>
+                            <div class="control">
+                                <input class="input" type="text" placeholder="" v-model.number="form.age"
+                                    @focus="err.age = ''" required>
+                            </div>
+                            <p v-if="err.age" class="help is-danger">[[ err.age ]]</p>
+                        </div>
+                        <div class="field">
+                            <label class="label">Height</label>
+                            <div class="control">
+                                <input class="input" type="text" placeholder="cm" v-model.number="form.height"
+                                    @focus="err.height = ''" required>
+                            </div>
+                            <p v-if="err.height" class="help is-danger">[[ err.height ]]</p>
+                        </div>
+                        <div class="field">
+                            <label class="label">Weight</label>
+                            <div class="control">
+                                <input class="input" type="text" placeholder="kg" v-model.number="form.weight"
+                                    @focus="err.weight =''" required>
+                            </div>
+                            <p v-if="err.weight" class="help is-danger">[[ err.weight ]]</p>
+                        </div>
+                        <div class="field">
+                            <div class="control">
+                                <button class="button is-link">Save</button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
     <hr>
 </div>
+
+<script src="{% static 'profile.js' %}"></script>
 {% endblock %}
 
 {% block footer %}

@@ -2,7 +2,7 @@
 
 {% load static %}
 
-{% block title %}Fit 35 Food Page{% endblock %}
+{% block title %}Fit 35 Food/Exercise Page{% endblock %}
 
 {% block css-style %}
 <style>
@@ -22,37 +22,6 @@
 </style>
 {% endblock %}
 
-{% block nav %}
-<nav class="level navbar">
-    <p class="level-item has-text-centered">
-        <img src="{% static 'boat.png' %}" alt="" style="height: 80px;">
-        <span class="is-family-primary">35 Fit</span>
-    </p>
-    <a href="{% url 'dashboard' %}" class="level-item has-text-centered">
-        DASHBOARD
-    </a>
-    <a class="level-item has-text-centered is-active-level">
-        CALORIE QUERY
-    </a>
-    <a class="level-item has-text-centered">
-        EXPERT ARTICLES
-    </a>
-    <div class="navbar-item level-item has-dropdown is-hoverable">
-        <a class="navbar-link">
-            Hi! {{ username }}
-        </a>
-        <div class="navbar-dropdown">
-            <a href="{% url 'profile' %}" class="dropdown-item level-item">
-                Account & Profile
-            </a>
-            <a href="{% url 'signout' %}" class="dropdown-item level-item">
-                Sign Out
-            </a>
-        </div>
-    </div>
-</nav>
-{% endblock %}
-
 {% block content %}
 <section id="food_exercise_app">
     <div class="box">
@@ -60,9 +29,9 @@
             <ul>
                 {% if food_page %}
                 <li class="is-active"><a>Food Calories</a></li>
-                <li><a>Exercise Calories</a></li>
+                <li><a href="{% url 'exercise_page'  %}">Exercise Calories</a></li>
                 {% else %}
-                <li><a>Food Calories</a></li>
+                <li><a href="{% url 'food_page' %}">Food Calories</a></li>
                 <li class="is-active"><a>Exercise Calories</a></li>
                 {% endif %}
             </ul>
@@ -95,9 +64,9 @@
                                 <div class="describe">
                                     <div v-if="pageType == 'food'">
                                         <p>${ item.category }$</p>
-                                        <p>Categories: ${ item.calorie }$ per 100g</p>
+                                        <p>Calories: ${ item.calorie }$ per 100g</p>
                                     </div>
-                                    <p v-else>Categories: ${ item.categories }$ per minute</p>
+                                    <p v-else>Calories: ${ item.calorie }$ per minute</p>
                                 </div>
                             </div>
                             <span class="icon" @click="activateModal(item)" style="cursor: pointer">

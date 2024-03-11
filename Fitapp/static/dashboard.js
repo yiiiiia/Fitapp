@@ -34,46 +34,8 @@ function weekDayName(day) {
         return "Sat"
     }
     return ""
+
 }
-document.addEventListener('DOMContentLoaded', function() {
-    var signoutLink = document.getElementById('signout-link');
-
-    signoutLink.addEventListener('click', function(e) {
-        e.preventDefault();
-
-        fetch('/userprofile/signout/', {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': getCookie('csrftoken'),
-                'Content-Type': 'application/json'
-            },
-            credentials: 'same-origin'
-        })
-        .then(response => {
-            if (response.ok) {
-                window.location.href = '/userprofile/login/';
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-    });
-
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            let cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                let cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-});
 
 function getDaysOfThisWeek() {
     const today = new Date()
@@ -88,25 +50,6 @@ function getDaysOfThisWeek() {
         result.push(parseDate(today))
     }
     return result
-}
-
-function getCalorieDeficitByDate(date) {
-    // TODO backend API
-    let randInt = function () {
-        return Math.floor(Math.random() * 250)
-    }
-
-    let n = randInt()
-    if (Math.random() <= 0.55) {
-        return n;
-    } else {
-        return -n
-    }
-}
-
-function getTodayIntake(date) {
-    return fetch('/nutrition/food_daily/')
-        .then(response => response.json());
 }
 
 const { createApp } = Vue;
@@ -130,11 +73,14 @@ const metabolismApp = Vue.createApp({
                     const latestData = data[0];
                     this.metabolismData = latestData;
                 }
-                console.log('Today metabolism:', this.metabolismData);
+                console.log('Today metabolism:', data);
             })
             .catch(error => console.error('Error:', error));
+    },
+    compilerOptions: {
+        delimiters: ["[[", "]]"]
     }
-}).mount('#metabolism-section');
+}).mount('#metabolism-app');
 
 
 const barApp = createApp({
@@ -155,26 +101,24 @@ const barApp = createApp({
                 .then(response => response.json())
                 .then(data => {
                     console.log('Received data from API:', data);
-        
                     this.weeklyMetabolismData = data.map((item, index) => {
                         const dayName = weekDayName(new Date(item.date).getDay());
                         const total = item.total;
                         return { day: dayName, total: total };
                     });
-        
+
                     console.log('Processed weekly metabolism data:', this.weeklyMetabolismData);
                 })
                 .catch(error => {
                     console.error('Error:', error);
                 });
         }
-        
+
     },
     compilerOptions: {
-        delimiters: ["${", "}$"]
+        delimiters: ["[[", "]]"]
     }
-}).mount('#calorie-bar');
-
+}).mount('#calorie-bar-app');
 
 const pieApp = createApp({
     mounted() {
@@ -190,10 +134,12 @@ const pieApp = createApp({
     },
     methods: {
         loadTodayIntake() {
-            getTodayIntake().then(data => {
-                this.intake = data;
-                console.log('Today Intake:', this.intake);
-            });
+            fetch('/nutrition/food_daily/')
+                .then(response => response.json())
+                .then(data => {
+                    this.intake = data;
+                    console.log('Today Intake:', data);
+                });
         },
         pieStyle() {
             return `background:
@@ -210,52 +156,22 @@ const pieApp = createApp({
         }
     },
     compilerOptions: {
-        delimiters: ["${", "}$"]
+        delimiters: ["[[", "]]"]
     }
-}).mount('#calorie-pie')
-
-const articleApp = createApp({
-    mounted() {
-        this.loadFavouriteArticles()
-    },
-    data() {
-        return {
-            articles: []
-        }
-    },
-    methods: {
-        loadFavouriteArticles() {
-            // TODO backend API
-            this.articles = [{
-                title: 'One Twin Was Hurt, the Other Was Not. Their Adult Mental Health Diverged',
-                content: 'Take Dennis and Douglas. In high school, they were so alike that friends told them apart by the cars they drove, they told researchers in a study of twins in Virginia. Most of their childhood experiences were shared — except that Dennis endured an attempted molestation when he was 13.'
-            }, {
-                title: 'F.D.A. Delays Action on Closely Watched Alzheimer’s Drug',
-                content: 'The Alabama Supreme Court ruled last month that frozen embryos are human beings and those who destroy them can be held liable for wrongful death. Three of the state’s limited pool of IVF providers immediately paused services, sending some families out of state to access treatment and prompting a widespread and urgent demand for lawmakers to provide a fast fix.'
-            }]
-            console.log('hi,articles')
-        }
-    },
-    compilerOptions: {
-        delimiters: ["${", "}$"]
-    }
-}).mount('#favourite-articles')
-
-
-
+}).mount('#calorie-pie-app')
 
 var map = new ol.Map({
     target: 'map',
     layers: [
-      new ol.layer.Tile({
-        source: new ol.source.OSM()  // 使用OpenStreetMap瓦片
-      })
+        new ol.layer.Tile({
+            source: new ol.source.OSM()  // 使用OpenStreetMap瓦片
+        })
     ],
     view: new ol.View({
-      center: ol.proj.fromLonLat([0, 0]),  // 默认中心点
-      zoom: 2  // 默认缩放级别
+        center: ol.proj.fromLonLat([0, 0]),  // 默认中心点
+        zoom: 2  // 默认缩放级别
     })
-  });
+});
 var userLocationCoords;
 function addLocationMarker(position) {
     userLocationCoords = ol.proj.fromLonLat([position.coords.longitude, position.coords.latitude]);
@@ -271,13 +187,12 @@ function addLocationMarker(position) {
 
     marker.setStyle(markerStyle);
 
-
     var vectorSource = new ol.source.Vector({
-      features: [marker],
+        features: [marker],
     });
 
     var markerVectorLayer = new ol.layer.Vector({
-      source: vectorSource,
+        source: vectorSource,
     });
 
     map.addLayer(markerVectorLayer);
@@ -301,68 +216,68 @@ function fetchNearbyGyms(latitude, longitude) {
     `;
 
     fetch('https://overpass-api.de/api/interpreter?data=' + encodeURIComponent(query))
-      .then(response => response.json())
-      .then(data => {
-        var gymListElement = document.getElementById('gym-list');
-        gymListElement.innerHTML = '';
+        .then(response => response.json())
+        .then(data => {
+            var gymListElement = document.getElementById('gym-list');
+            gymListElement.innerHTML = '';
 
-        data.elements.forEach(element => {
-              if (!element.tags.name || !element.tags['addr:street'] || typeof element.lat === 'undefined' || typeof element.lon === 'undefined') {
-                return;  // If there is no name, street information, or valid coordinates, skip this element
-            }
-            var coords = ol.proj.fromLonLat([element.lon, element.lat]);
-            var feature = new ol.Feature({
-                geometry: new ol.geom.Point(coords),
+            data.elements.forEach(element => {
+                if (!element.tags.name || !element.tags['addr:street'] || typeof element.lat === 'undefined' || typeof element.lon === 'undefined') {
+                    return;  // If there is no name, street information, or valid coordinates, skip this element
+                }
+                var coords = ol.proj.fromLonLat([element.lon, element.lat]);
+                var feature = new ol.Feature({
+                    geometry: new ol.geom.Point(coords),
+                });
+
+                var style = new ol.style.Style({
+                    image: new ol.style.Icon({
+                        color: 'red',
+                        crossOrigin: 'anonymous',
+                        src: 'data:image/svg+xml;utf8,<svg fill="%23ff0000" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" width="40px" height="40px"><circle cx="15" cy="15" r="15"/></svg>',
+                        scale: 0.5,
+                    }),
+                });
+
+                feature.setStyle(style);
+
+                var vectorSource = new ol.source.Vector({
+                    features: [feature],
+                });
+
+                var markerVectorLayer = new ol.layer.Vector({
+                    source: vectorSource,
+                });
+
+                map.addLayer(markerVectorLayer);
+
+                // 添加详细信息到列表
+                var listItem = document.createElement('li');
+                listItem.textContent = `${element.tags.name}, ${element.tags['addr:street']}, ${element.tags['addr:postcode'] ? element.tags['addr:postcode'] : 'No postcode info'}`;
+                listItem.classList.add('clickable-list-item');
+                listItem.onclick = function () {
+                    map.getView().setCenter(coords);
+                    map.getView().setZoom(18);
+                };
+                gymListElement.appendChild(listItem);
             });
 
-            var style = new ol.style.Style({
-                image: new ol.style.Icon({
-                    color: 'red',
-                    crossOrigin: 'anonymous',
-                    src: 'data:image/svg+xml;utf8,<svg fill="%23ff0000" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" width="40px" height="40px"><circle cx="15" cy="15" r="15"/></svg>',
-                    scale: 0.5,
-                }),
-            });
-
-            feature.setStyle(style);
-
-            var vectorSource = new ol.source.Vector({
-                features: [feature],
-            });
-
-            var markerVectorLayer = new ol.layer.Vector({
-                source: vectorSource,
-            });
-
-            map.addLayer(markerVectorLayer);
-
-            // 添加详细信息到列表
-            var listItem = document.createElement('li');
-            listItem.textContent = `${element.tags.name}, ${element.tags['addr:street']}, ${element.tags['addr:postcode'] ? element.tags['addr:postcode'] : 'No postcode info'}`;
-            listItem.classList.add('clickable-list-item');
-            listItem.onclick = function() {
-                map.getView().setCenter(coords);
-                map.getView().setZoom(18);
+            document.getElementById('back-to-user-location').onclick = function () {
+                if (userLocationCoords) {
+                    map.getView().setCenter(userLocationCoords);
+                    map.getView().setZoom(15);
+                }
             };
-            gymListElement.appendChild(listItem);
+
         });
-
-        document.getElementById('back-to-user-location').onclick = function() {
-            if (userLocationCoords) {
-                map.getView().setCenter(userLocationCoords);
-                map.getView().setZoom(15);
-            }
-        };
-
-      });
 }
 
 
 if ("geolocation" in navigator) {
-    navigator.geolocation.getCurrentPosition(function(position) {
-      addLocationMarker(position);
-    }, function(error) {
-      console.log("Error occurred. Error code: " + error.code);
+    navigator.geolocation.getCurrentPosition(function (position) {
+        addLocationMarker(position);
+    }, function (error) {
+        console.log("Error occurred. Error code: " + error.code);
     });
 } else {
     console.log("Geolocation is not supported by this browser.");

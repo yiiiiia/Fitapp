@@ -1,24 +1,27 @@
 import random
 import string
-from django.db.models import Q
+
 from django.contrib.auth.models import User
+from django.db.models import Q
+from django.http import JsonResponse
 from django.shortcuts import redirect, render
+from django.utils import timezone
+from nutrition.models import DailyMetabolism
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
 from .forms import ExerciseBookForm
 from .models import ExerciseBook, ExerciseDone
-from nutrition.models import DailyMetabolism
-from rest_framework.response import Response
-from django.utils import timezone
-from django.http import JsonResponse
+
 
 class DashboardView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         return render(request, 'dashboard.html', {'username': request.user.get_username()})
+
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
@@ -33,10 +36,20 @@ def add_exercise(request):
 
     return render(request, 'add_exercise.html', {'form': form})
 
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def exercise_page(request):
-    return render(request, 'food_exercise.html')
+    user = request.user
+    letters = string.digits
+    q = ''.join(random.choice(letters) for i in range(10))
+    return render(request, 'food_exercise.html', {
+        'food_page': False,
+        'page_type': 'exercise',
+        'q': q,
+        'username': user.get_username()
+    })
+
 
 class ExerciseListView(APIView):
     def get(self, request):
@@ -56,7 +69,8 @@ class ExerciseListView(APIView):
             } for exercise in exercises
         ]
         return Response(data)
-    
+
+
 class AddExerciseDoneView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -67,7 +81,8 @@ class AddExerciseDoneView(APIView):
         date = request.data.get('date') or timezone.now().date()
 
         exercise = ExerciseBook.objects.get(id=exercise_id)
-        ExerciseDone.objects.create(user=user, exercise=exercise, duration=duration, date=date)
+        ExerciseDone.objects.create(
+            user=user, exercise=exercise, duration=duration, date=date)
 
         # 检查是否已存在 DailyMetabolism 记录
         daily_metabolism, created = DailyMetabolism.objects.get_or_create(user=user, date=date, defaults={
@@ -77,7 +92,8 @@ class AddExerciseDoneView(APIView):
         # 更新 exercise_metabolism 和 total
         exercise_calories = exercise.calories_burned_per_min * duration
         daily_metabolism.exercise_metabolism += exercise_calories
-        daily_metabolism.total = daily_metabolism.bmr + daily_metabolism.intake - daily_metabolism.exercise_metabolism
+        daily_metabolism.total = daily_metabolism.bmr + \
+            daily_metabolism.intake - daily_metabolism.exercise_metabolism
         daily_metabolism.save()
 
         return JsonResponse({'message': 'Exercise recorded successfully'})

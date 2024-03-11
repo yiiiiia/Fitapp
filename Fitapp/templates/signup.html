@@ -6,12 +6,15 @@
 Join Fit 35
 {% endblock %}
 
+{% block nav %}
+{% endblock %}
+
 {% block content %}
 <section class="hero is-primary is-fullheight">
     <div class="hero-body">
         <div class="container">
             <div class="columns is-centered">
-                <div id="app" class="column is-mobile is-3-tablet is-3-desktop is-4-widescreen">
+                <div id="app-signup" class="column is-mobile is-3-tablet is-3-desktop is-4-widescreen">
                     <form class="box" action="{% url 'signup' %}" @submit.prevent="submit" ref="form">
                         {% csrf_token %}
                         <a class="is-hidden" href="{% url 'login' %}" ref="redirect_page"></a>

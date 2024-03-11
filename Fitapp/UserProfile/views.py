@@ -1,37 +1,22 @@
+import logging
 import random
 import string
 
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
-from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
-from rest_framework.views import APIView
-from rest_framework import status
-from django.contrib.auth import login
-from rest_framework.response import Response
-import logging
-from rest_framework.permissions import IsAuthenticated
-from nutrition.models import DailyMetabolism
-from .models import UserProfile
 from django.utils import timezone
-from django.contrib.auth import logout
+from nutrition.models import DailyMetabolism
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-def login_required(func):
-    def wrapper(request):
-        if request.session.get('user_id'):
-            return func(request)
-        else:
-            return redirect('login')
-    return wrapper
+from .models import UserProfile
 
-
-@login_required
-def sign_out(request):
-    if request.session.get('user_id'):
-        del request.session['user_id']
-    return redirect('login')
+logger = logging.getLogger(__name__)
 
 
 class LoginView(APIView):
@@ -44,8 +29,6 @@ class LoginView(APIView):
             return render(request, 'login.html', {'q': q})
 
     def post(self, request, *args, **kwargs):
-        logger = logging.getLogger(__name__)
-
         username = request.data.get('username')
         password = request.data.get('password')
         user = authenticate(username=username, password=password)
@@ -63,14 +46,19 @@ class LoginView(APIView):
                 return Response({'error': 'user not exist'}, status=status.HTTP_404_NOT_FOUND)
 
 
+class SignOutView(APIView):
+    def post(self, request):
+        logout(request)
+        return Response({'message': 'Successfully logged out'}, status=status.HTTP_200_OK)
+
+
 class SignupView(APIView):
     def get(self, request):
         if request.user.is_authenticated:
             next_page = reverse('dashboard')
             return Response({'next_page': next_page})
         else:
-            loginURL = reverse('login')
-            return Response({'login_page': loginURL})
+            return render(request, 'signup.html')
 
     def post(self, request, *args, **kwargs):
         username = request.data.get('username')
@@ -95,42 +83,38 @@ class SignupView(APIView):
         return Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
 
 
+class SignupCheckView(APIView):
+    def get(self, request):
+        username = request.GET.get('username')
+        email = request.GET.get('email')
+        if username:
+            if User.objects.filter(username=username).exists():
+                return Response({'exists': True}, status=status.HTTP_200_OK)
+            else:
+                return Response({'exists': False}, status=status.HTTP_200_OK)
+        elif email:
+            if User.objects.filter(email=email).exists():
+                return Response({'exists': True}, status=status.HTTP_200_OK)
+            else:
+                return Response({'exists': False}, status=status.HTTP_200_OK)
+        else:
+            return Response({'exists': False}, status=status.HTTP_200_OK)
+
+
 class UserProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         user = request.user
-        return render(request, 'profile.html', {'username': user.get_username(), 'email': user.email})
-
-    def post(self, request):
-        return JsonResponse({'msg': 'good'}, status=200)
-
-    def put(self, request):
-        return JsonResponse({'msg': 'good'}, status=200)
-
-class SignOutView(APIView):
-    def post(self, request):
-        logout(request)
-        return Response({'message': 'Successfully logged out'}, status=status.HTTP_200_OK)
-
-def check_username_email(request):
-    username = request.GET.get('username')
-    email = request.GET.get('email')
-    if username:
-        if User.objects.filter(username=username).exists():
-            return JsonResponse({'exists': True}, status=200)
-        else:
-            return JsonResponse({'exists': False}, status=200)
-    elif email:
-        if User.objects.filter(email=email).exists():
-            return JsonResponse({'exists': True}, status=200)
-        else:
-            return JsonResponse({'exists': False}, status=200)
-    else:
-        return JsonResponse({'error': 'invalid parameter'}, status=400)
-
-class UpdateUserProfileView(APIView):
-    permission_classes = [IsAuthenticated]
+        profile = UserProfile.objects.get(user_id=user.id)
+        if profile:
+            if profile.gender:
+                profile.gender = profile.gender.title()
+            if profile.height:
+                profile.height = '{:.1f}'.format(profile.height)
+            if profile.weight:
+                profile.weight = '{:.1f}'.format(profile.weight)
+        return render(request, 'profile.html', {'username': user.get_username(), 'email': user.email, 'profile': profile})
 
     def post(self, request, *args, **kwargs):
         user = request.user
@@ -144,16 +128,19 @@ class UpdateUserProfileView(APIView):
 
         # 计算 BMR
         if profile.gender == 'male':
-            bmr = 88.362 + (13.397 * profile.weight) + (4.799 * profile.height * 100) - (5.677 * profile.age)
+            bmr = 88.362 + (13.397 * profile.weight) + (4.799 *
+                                                        profile.height * 100) - (5.677 * profile.age)
         else:
-            bmr = 447.593 + (9.247 * profile.weight) + (3.098 * profile.height * 100) - (4.330 * profile.age)
+            bmr = 447.593 + (9.247 * profile.weight) + (3.098 *
+                                                        profile.height * 100) - (4.330 * profile.age)
 
         # 更新 DailyMetabolism
         daily_metabolism, created = DailyMetabolism.objects.get_or_create(user=user, date=timezone.now().date(), defaults={
             'bmr': bmr, 'intake': 0, 'exercise_metabolism': 0, 'total': bmr
         })
         daily_metabolism.bmr = bmr
-        daily_metabolism.total = bmr + daily_metabolism.intake - daily_metabolism.exercise_metabolism
+        daily_metabolism.total = bmr + daily_metabolism.intake - \
+            daily_metabolism.exercise_metabolism
         daily_metabolism.save()
 
-        return JsonResponse({'message': 'Profile updated successfully', 'bmr': bmr})
+        return Response({'message': 'Profile updated successfully', 'bmr': bmr}, status=status.HTTP_200_OK)

@@ -81,7 +81,7 @@ const app = createApp({
         check_username() {
             const username = this.form.username
             if (username) {
-                fetch('/userprofile/check_username_email?username=' + encodeURIComponent(username)).then((resp) => {
+                fetch('/userprofile/signup_check?username=' + encodeURIComponent(username)).then((resp) => {
                     resp.json().then((val) => {
                         if (val.exists) {
                             this.username.error('This username already exists')
@@ -104,7 +104,7 @@ const app = createApp({
                 this.email.error('Not valid Email')
                 return
             }
-            fetch('/userprofile/check_username_email?email=' + encodeURIComponent(email)).then((resp) => {
+            fetch('/userprofile/signup_check?email=' + encodeURIComponent(email)).then((resp) => {
                 resp.json().then((val) => {
                     if (val.exists) {
                         this.email.error('This email is registered')
@@ -134,7 +134,7 @@ const app = createApp({
             count = 0
             const specialChars = '!@#$%^&*()_'
             for (ch of pass) {
-                if (specialChars.indexOf(ch) > 0) {
+                if (specialChars.indexOf(ch) >= 0) {
                     count++;
                 }
             }
@@ -162,6 +162,7 @@ const app = createApp({
             }
         }
     },
-});
-app.config.compilerOptions.delimiters = ["[[", "]]"];
-app.mount("#app");
+    compilerOptions: {
+        delimiters: ["[[", "]]"]
+    }
+}).mount('#app-signup')
