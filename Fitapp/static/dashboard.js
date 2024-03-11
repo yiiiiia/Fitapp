@@ -35,6 +35,45 @@ function weekDayName(day) {
     }
     return ""
 }
+document.addEventListener('DOMContentLoaded', function() {
+    var signoutLink = document.getElementById('signout-link');
+
+    signoutLink.addEventListener('click', function(e) {
+        e.preventDefault();
+
+        fetch('/userprofile/signout/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+            },
+            credentials: 'same-origin'
+        })
+        .then(response => {
+            if (response.ok) {
+                window.location.href = '/userprofile/login/';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            let cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                let cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
 
 function getDaysOfThisWeek() {
     const today = new Date()

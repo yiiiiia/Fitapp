@@ -16,6 +16,7 @@ from rest_framework.permissions import IsAuthenticated
 from nutrition.models import DailyMetabolism
 from .models import UserProfile
 from django.utils import timezone
+from django.contrib.auth import logout
 
 def login_required(func):
     def wrapper(request):
@@ -107,6 +108,10 @@ class UserProfileView(APIView):
     def put(self, request):
         return JsonResponse({'msg': 'good'}, status=200)
 
+class SignOutView(APIView):
+    def post(self, request):
+        logout(request)
+        return Response({'message': 'Successfully logged out'}, status=status.HTTP_200_OK)
 
 def check_username_email(request):
     username = request.GET.get('username')
