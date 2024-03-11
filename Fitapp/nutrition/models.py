@@ -24,6 +24,7 @@ class DailyMetabolism(models.Model):
 class FoodBook(models.Model):
     food_type = models.CharField(max_length=30)
     food_name = models.CharField(max_length=100)
+    image = models.ImageField(upload_to='food_images/')
     calories_per_gram = models.FloatField()
     protein_per_gram = models.FloatField()
     fat_per_gram = models.FloatField()

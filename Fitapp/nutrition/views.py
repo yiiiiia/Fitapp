@@ -9,7 +9,6 @@ from django.utils import timezone
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from UserProfile.views import login_required
 
 from .models import DailyMetabolism, FoodBook, FoodEaten
 
@@ -37,9 +36,16 @@ class FoodBookSerializer(serializers.ModelSerializer):
 class FoodListView(APIView):
     def get(self, request):
         foods = FoodBook.objects.all()
-        data = [{"id": food.id, "name": food.food_name} for food in foods]
+        data = [
+            {
+                "id": food.id,
+                "name": food.food_name,
+                "category": food.food_type,
+                "calorie": food.calories_per_gram * 100,
+                "image": request.build_absolute_uri(food.image.url) if food.image else None
+            } for food in foods
+        ]
         return Response(data)
-
 
 class AddFoodEatenView(APIView):
     permission_classes = [IsAuthenticated]
@@ -73,15 +79,20 @@ class UserRelatedDataView(APIView):
         })
 
 
-@login_required
-def food_page(request):
-    user_id = request.session.get('user_id')
-    user = User.objects.get(id=user_id)
-    letters = string.digits
-    q = ''.join(random.choice(letters) for i in range(10))
-    return render(request, 'food_exercise.html', {'food_page': True, 'page_type': 'food', 'q': q, 'username': user.get_username()})
+class FoodPageView(APIView):
+    permission_classes = [IsAuthenticated]
 
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        letters = string.digits
+        q = ''.join(random.choice(letters) for i in range(10))
 
+        return render(request, 'food_exercise.html', {
+            'food_page': True, 
+            'page_type': 'food', 
+            'q': q, 
+            'username': user.get_username()
+        })
 
 class MetabolismView(APIView):
     permission_classes = [IsAuthenticated]

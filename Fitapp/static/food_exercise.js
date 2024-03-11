@@ -2,32 +2,33 @@ const { createApp } = Vue;
 
 // @cardType: 'food' or 'exercise
 function loadCards(cardType, page = 1, pageSize = 12, searchBy = '') {
-    // TODO backend API
-    // mock data
-    return [
-        {
-            id: 0,
-            image: '/static/grocery.jpeg',
-            name: 'Pasta',
-            category: 'Carbohydrate',
-            calorie: 130
-        },
-        {
-            id: 1,
-            image: '/static/grocery.jpeg',
-            name: 'Tomato',
-            category: 'Vegetable',
-            calorie: 20
-        },
-        {
-            id: 2,
-            image: '/static/grocery.jpeg',
-            name: 'Chicken Breast',
-            category: 'Protein',
-            calorie: 175
-        }
-    ]
+    let apiUrl = (cardType === 'food') ? '/nutrition/food_list/' : '/fitness/exercise_list/';
+    if (searchBy !== '') {
+        apiUrl += '?search=' + encodeURIComponent(searchBy);
+    }
+
+    return fetch(apiUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            return data.map(item => ({
+                id: item.id,
+                image: item.image,
+                name: item.name,
+                category: item.category,
+                calorie: Math.round(item.calorie)
+            }));
+        })
+        .catch(error => {
+            console.error('Fetch error:', error);
+            return [];
+        });
 }
+
 
 // @recordType: 'food' or 'exercise
 // @entity: id of the food or exercise
@@ -70,7 +71,9 @@ const foodExerciseApp = createApp({
             }
         },
         loadCards() {
-            this.cards = loadCards(this.pageType)
+            loadCards(this.pageType).then(cards => {
+                this.cards = cards;
+            });
         },
         activateModal(item) {
             this.recordItem = item
