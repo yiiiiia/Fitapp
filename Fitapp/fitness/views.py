@@ -8,6 +8,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from .forms import ExerciseBookForm
+from .models import ExerciseBook
+from rest_framework.response import Response
 
 
 class DashboardView(APIView):
@@ -20,13 +22,10 @@ class DashboardView(APIView):
 @permission_classes([IsAuthenticated])
 def add_exercise(request):
     if request.method == 'POST':
-        # DRF方式处理表单数据
-        # ... 逻辑 ...
         form = ExerciseBookForm(request.POST)
         if form.is_valid():
             form.save()
             return redirect('some_view_name')
-        # 如果表单无效，继续显示表单及错误信息
     else:
         form = ExerciseBookForm()
 
@@ -36,3 +35,16 @@ def add_exercise(request):
 @permission_classes([IsAuthenticated])
 def exercise_page(request):
     return render(request, 'food_exercise.html')
+
+class ExerciseListView(APIView):
+    def get(self, request):
+        exercises = ExerciseBook.objects.all()
+        data = [
+            {
+                "id": exercise.id,
+                "name": exercise.exercise_name,
+                "calories_burned_per_min": exercise.calories_burned_per_min * 100,
+                "image": request.build_absolute_uri(exercise.image.url) if exercise.image else None
+            } for exercise in exercises
+        ]
+        return Response(data)
