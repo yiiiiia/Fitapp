@@ -4,17 +4,17 @@ const app = createApp({
         return {
             form: {},
             inputClass: 'input',
-            errCode: 0
+            errcode: 0
         };
     },
     methods: {
         setNormal() {
-            this.errCode = 0
             this.inputClass = 'input'
+            this.errcode = 0
         },
         async submit() {
             try {
-                const csrftoken = Cookies.get('csrftoken');
+                const csrftoken = Cookies.get('csrftoken')
                 const resp = await fetch('/userprofile/login/', {
                     method: 'post',
                     mode: 'same-origin',
@@ -32,7 +32,11 @@ const app = createApp({
                 } else if (resp.status == 404) {
                     resp.json().then((value) => {
                         this.inputClass = 'input is-danger'
-                        this.errCode = value.err_code
+                        if (value.error == 'user not exist') {
+                            this.errcode = 1
+                        } else if (value.error == 'incorrect password') {
+                            this.errcode = 2
+                        }
                     })
                 }
             } catch (e) {

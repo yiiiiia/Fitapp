@@ -1,38 +1,35 @@
 const { createApp } = Vue;
 
 // @cardType: 'food' or 'exercise
-function loadCards(cardType, page = 1, pageSize = 12, searchBy = '') {
+async function loadCards(cardType, page = 1, pageSize = 12, searchBy = '') {
     let apiUrl = (cardType === 'food') ? '/nutrition/food_list/' : '/fitness/exercise_list/';
     if (searchBy !== '') {
         apiUrl += '?search=' + encodeURIComponent(searchBy);
     }
 
-    return fetch(apiUrl)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            return data.map(item => ({
-                id: item.id,
-                image: item.image,
-                name: item.name,
-                category: item.category,
-                calorie: Math.round(item.calorie)
-            }));
-        })
-        .catch(error => {
-            console.error('Fetch error:', error);
-            return [];
-        });
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        return data.map(item => ({
+            id: item.id,
+            image: item.image,
+            name: item.name,
+            category: item.category,
+            calorie: Math.round(item.calorie)
+        }));
+    } catch (error) {
+        console.error('Fetch error:', error);
+        return [];
+    }
 }
 
 
 // @recordType: 'food' or 'exercise
 // @entity: id of the food or exercise
-function saveRecord(recordType, entityId, quantity) {
+async function saveRecord(recordType, entityId, quantity) {
     let apiUrl = (recordType === 'food') ? '/nutrition/add_food_eaten/' : '/fitness/add_exercise_done/';
     let payload = {
         food: entityId,
@@ -40,28 +37,25 @@ function saveRecord(recordType, entityId, quantity) {
         date: new Date().toISOString().split('T')[0]
     };
 
-    return fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': Cookies.get('csrftoken')
-        },
-        body: JSON.stringify(payload),
-        credentials: 'include'
-    })
-    .then(response => {
+    try {
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': Cookies.get('csrftoken')
+            },
+            body: JSON.stringify(payload),
+            credentials: 'include'
+        });
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
-        return response.json();
-    })
-    .then(data => {
+        const data = await response.json();
         return data.message;
-    })
-    .catch(error => {
+    } catch (error) {
         console.error('Save record error:', error);
         return 'Error';
-    });
+    }
 }
 
 const foodExerciseApp = createApp({
