@@ -97,6 +97,7 @@ const metabolismApp = Vue.createApp({
     }
 }).mount('#metabolism-section');
 
+
 const barApp = createApp({
     mounted() {
         this.loadMetabolismDataThisWeek();
@@ -200,3 +201,130 @@ const articleApp = createApp({
         delimiters: ["${", "}$"]
     }
 }).mount('#favourite-articles')
+
+
+
+
+var map = new ol.Map({
+    target: 'map',
+    layers: [
+      new ol.layer.Tile({
+        source: new ol.source.OSM()  // 使用OpenStreetMap瓦片
+      })
+    ],
+    view: new ol.View({
+      center: ol.proj.fromLonLat([0, 0]),  // 默认中心点
+      zoom: 2  // 默认缩放级别
+    })
+  });
+var userLocationCoords;
+function addLocationMarker(position) {
+    userLocationCoords = ol.proj.fromLonLat([position.coords.longitude, position.coords.latitude]);
+    var markerStyle = new ol.style.Style({
+        image: new ol.style.Icon({
+            src: 'https://maps.google.com/mapfiles/ms/icons/green-dot.png', // 绿色图标的 URL
+            scale: 0.8 // 调整图标大小
+        })
+    });
+    var marker = new ol.Feature({
+        geometry: new ol.geom.Point(userLocationCoords),
+    });
+
+    marker.setStyle(markerStyle);
+
+
+    var vectorSource = new ol.source.Vector({
+      features: [marker],
+    });
+
+    var markerVectorLayer = new ol.layer.Vector({
+      source: vectorSource,
+    });
+
+    map.addLayer(markerVectorLayer);
+    map.getView().setCenter(userLocationCoords);
+    map.getView().setZoom(15);
+
+    // 获取附近健身房
+    fetchNearbyGyms(position.coords.latitude, position.coords.longitude);
+}
+function fetchNearbyGyms(latitude, longitude) {
+    var radius = 5000; // 搜索半径，单位是米
+    var query = `
+    [out:json];
+    (
+      node["leisure"="fitness_centre"](around:${radius},${latitude},${longitude});
+      node["amenity"="gym"](around:${radius},${latitude},${longitude});
+      node["sport"="fitness"](around:${radius},${latitude},${longitude});
+    );
+    out center;
+    out tags;
+    `;
+
+    fetch('https://overpass-api.de/api/interpreter?data=' + encodeURIComponent(query))
+      .then(response => response.json())
+      .then(data => {
+        var gymListElement = document.getElementById('gym-list');
+        gymListElement.innerHTML = '';
+
+        data.elements.forEach(element => {
+              if (!element.tags.name || !element.tags['addr:street'] || typeof element.lat === 'undefined' || typeof element.lon === 'undefined') {
+                return;  // If there is no name, street information, or valid coordinates, skip this element
+            }
+            var coords = ol.proj.fromLonLat([element.lon, element.lat]);
+            var feature = new ol.Feature({
+                geometry: new ol.geom.Point(coords),
+            });
+
+            var style = new ol.style.Style({
+                image: new ol.style.Icon({
+                    color: 'red',
+                    crossOrigin: 'anonymous',
+                    src: 'data:image/svg+xml;utf8,<svg fill="%23ff0000" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" width="40px" height="40px"><circle cx="15" cy="15" r="15"/></svg>',
+                    scale: 0.5,
+                }),
+            });
+
+            feature.setStyle(style);
+
+            var vectorSource = new ol.source.Vector({
+                features: [feature],
+            });
+
+            var markerVectorLayer = new ol.layer.Vector({
+                source: vectorSource,
+            });
+
+            map.addLayer(markerVectorLayer);
+
+            // 添加详细信息到列表
+            var listItem = document.createElement('li');
+            listItem.textContent = `${element.tags.name}, ${element.tags['addr:street']}, ${element.tags['addr:postcode'] ? element.tags['addr:postcode'] : 'No postcode info'}`;
+            listItem.classList.add('clickable-list-item');
+            listItem.onclick = function() {
+                map.getView().setCenter(coords);
+                map.getView().setZoom(18);
+            };
+            gymListElement.appendChild(listItem);
+        });
+
+        document.getElementById('back-to-user-location').onclick = function() {
+            if (userLocationCoords) {
+                map.getView().setCenter(userLocationCoords);
+                map.getView().setZoom(15);
+            }
+        };
+
+      });
+}
+
+
+if ("geolocation" in navigator) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+      addLocationMarker(position);
+    }, function(error) {
+      console.log("Error occurred. Error code: " + error.code);
+    });
+} else {
+    console.log("Geolocation is not supported by this browser.");
+}
