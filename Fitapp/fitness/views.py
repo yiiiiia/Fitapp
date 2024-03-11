@@ -1,8 +1,8 @@
-import logging
+import random
+import string
 
 from django.contrib.auth.models import User
 from django.shortcuts import redirect, render
-from UserProfile.views import login_required
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView

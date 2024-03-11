@@ -4,17 +4,13 @@ const app = createApp({
         return {
             form: {},
             inputClass: 'input',
-            loginErr: false
+            errCode: 0
         };
     },
     methods: {
         setNormal() {
+            this.errCode = 0
             this.inputClass = 'input'
-            this.loginErr = false
-        },
-        setError() {
-            this.inputClass = 'input is-danger'
-            this.loginErr = true
         },
         async submit() {
             try {
@@ -34,15 +30,17 @@ const app = createApp({
                         window.location.href = value.next_page
                     })
                 } else if (resp.status == 404) {
-                    this.setError()
-                } else {
-                    alert('Server is unavailable')
+                    resp.json().then((value) => {
+                        this.inputClass = 'input is-danger'
+                        this.errCode = value.err_code
+                    })
                 }
             } catch (e) {
                 console.error(e)
             }
         },
+    },
+    compilerOptions: {
+        delimiters: ["${", "}$"]
     }
-});
-app.config.compilerOptions.delimiters = ["[[", "]]"];
-app.mount("#app");
+}).mount('#login_app')

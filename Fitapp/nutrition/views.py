@@ -1,16 +1,16 @@
 import random
 import string
+from datetime import timedelta
 
 from django.contrib.auth.models import User
 from django.http import JsonResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import render
 from django.utils import timezone
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from UserProfile.views import login_required
 
-from .forms import DailyMetabolismForm, FoodBookForm, FoodEatenForm
 from .models import DailyMetabolism, FoodBook, FoodEaten
 
 
@@ -39,10 +39,6 @@ class FoodListView(APIView):
         foods = FoodBook.objects.all()
         data = [{"id": food.id, "name": food.food_name} for food in foods]
         return Response(data)
-
-
-def show_add_food_eaten_page(request):
-    return render(request, 'add_food_eaten.html')
 
 
 class AddFoodEatenView(APIView):
@@ -75,18 +71,6 @@ class UserRelatedDataView(APIView):
             'foods_eaten': foods_eaten_serializer.data,
             'daily_metabolism': daily_metabolism_serializer.data
         })
-
-
-def add_food(request):
-    print("进入了 add_food 视图")
-    if request.method == 'POST':
-        form = FoodBookForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('some_view_name')
-    else:
-        form = FoodBookForm()
-    return render(request, 'add_food.html', {'form': form})
 
 
 @login_required
@@ -149,10 +133,10 @@ class FoodDailyView(APIView):
 
         return Response(percentages)
 
-
 def food_records(request):
     if request.user.is_authenticated:
-        food_eaten_records = list(FoodEaten.objects.filter(user=request.user).select_related('food').order_by('-date').values('food__food_name', 'amount', 'date', 'food__calories_per_gram', 'food__protein_per_gram', 'food__fat_per_gram', 'food__carbohydrate_per_gram', 'food__other_per_gram'))
+        food_eaten_records = list(FoodEaten.objects.filter(user=request.user).select_related('food').order_by('-date').values('food__food_name', 'amount',
+                                  'date', 'food__calories_per_gram', 'food__protein_per_gram', 'food__fat_per_gram', 'food__carbohydrate_per_gram', 'food__other_per_gram'))
         return JsonResponse({'food_eaten_records': food_eaten_records}, safe=False)
     else:
         return JsonResponse({'food_eaten_records': []})

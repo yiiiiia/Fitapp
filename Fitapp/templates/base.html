@@ -16,6 +16,17 @@
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
     <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+    <script>
+        function randStr() {
+            let chars = '0123456789!@#$%^&*()_+-='
+            let str = ''
+            for (let i = 0; i < chars.length; i++) {
+                let pos = Math.floor(Math.random() * chars.length)
+                str += chars.charAt(pos)
+            }
+        }
+    </script>
+
     {% block css-style %}
     {% endblock css-style %}
 </head>

@@ -6,14 +6,6 @@
 
 {% block css-style %}
 <style>
-    body {
-        font-family: serif;
-    }
-
-    nav {
-        font-size: 20px;
-    }
-
     .tab-link {
         cursor: pointer;
     }
@@ -113,7 +105,7 @@
     <a class="level-item has-text-centered is-active-level">
         DASHBOARD
     </a>
-    <a class="level-item has-text-centered">
+    <a href="{% url 'food_page' %}" class="level-item has-text-centered">
         CALORIE QUERY
     </a>
     <a class="level-item has-text-centered">
@@ -224,7 +216,7 @@
         </div>
     </div>
 </section>
-<script src="{% static 'dashboard.js' %}"></script>
+<script src="{% static 'dashboard.js' %}?q={{ q }}"></script>
 {% endblock %}
 
 {% block footer %}{% endblock %}

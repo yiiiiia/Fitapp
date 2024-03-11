@@ -6,7 +6,7 @@
     <div class="hero-body">
         <div class="container">
             <div class="columns is-centered">
-                <div id="app" class="column is-5-tablet is-5-desktop is-4-widescreen">
+                <div id="login_app" class="column is-5-tablet is-5-desktop is-4-widescreen">
                     <form class="box" @submit.prevent="submit" ref="form">
                         {% csrf_token %}
                         <div class="field">
@@ -17,7 +17,7 @@
                                 <span class="icon is-small is-left">
                                     <i class="fas fa-user"></i>
                                 </span>
-                                <p v-if="loginErr" class="help is-danger">user does not exist or wrong password</p>
+                                <p v-if="errCode == 1" class="help is-danger">user does not exist</p>
                             </div>
                         </div>
                         <div class="field">
@@ -28,6 +28,7 @@
                                 <span class="icon is-small is-left">
                                     <i class="fas fa-lock"></i>
                                 </span>
+                                <p v-if="errCode == 2" class="help is-danger">incorrect password</p>
                             </div>
                         </div>
                         <div class="field">
@@ -54,5 +55,5 @@
         </div>
     </div>
 </section>
-<script src="{% static 'login.js' %}"></script>
+<script src="{% static 'login.js' %}?q={{ q }}"></script>
 {% endblock %}
