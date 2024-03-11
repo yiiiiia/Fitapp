@@ -58,10 +58,10 @@ const metabolismApp = Vue.createApp({
     data() {
         return {
             metabolismData: {
-                exerciseMetabolism: 0,
-                dailyBasalMetabolism: 0,
-                caloriesTaken: 0,
-                sumForToday: 0
+                exercise_metabolism: 0,
+                bmr: 0,
+                intake: 0,
+                total: 0
             }
         };
     },
@@ -144,14 +144,14 @@ const pieApp = createApp({
         pieStyle() {
             return `background:
             conic-gradient(from 0deg,
-                    #f7f25e 0,
-                    #f7f25e calc(${this.intake.fat}%),
-                    #67f594 calc(${this.intake.fat}%),
-                    #67f594 calc(${this.intake.fat + this.intake.carbohydrate}%),
-                    #cf5351 calc(${this.intake.fat + this.intake.carbohydrate}%),
-                    #cf5351 calc(${this.intake.fat + this.intake.carbohydrate + this.intake.protein}%),
-                    #166778 calc(${this.intake.fat + this.intake.carbohydrate + this.intake.protein}%),
-                    #166778 calc(100%)
+                    #037ffc 0,
+                    #037ffc calc(${this.intake.fat}%),
+                    #21cc99 calc(${this.intake.fat}%),
+                    #21cc99 calc(${this.intake.fat + this.intake.carbohydrate}%),
+                    #db5625 calc(${this.intake.fat + this.intake.carbohydrate}%),
+                    #db5625 calc(${this.intake.fat + this.intake.carbohydrate + this.intake.protein}%),
+                    #fce158 calc(${this.intake.fat + this.intake.carbohydrate + this.intake.protein}%),
+                    #fce158 calc(100%)
             )`
         }
     },
