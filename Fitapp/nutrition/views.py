@@ -17,6 +17,7 @@ from datetime import timedelta
 from django.utils import timezone
 from rest_framework import serializers
 from datetime import datetime
+from django.db.models import Q
 
 class FoodEatenSerializer(serializers.ModelSerializer):
     class Meta:
@@ -35,7 +36,14 @@ class FoodBookSerializer(serializers.ModelSerializer):
 
 class FoodListView(APIView):
     def get(self, request):
-        foods = FoodBook.objects.all()
+        search_query = request.query_params.get('search', None)
+        if search_query:
+            foods = FoodBook.objects.filter(
+                Q(food_name__icontains=search_query) | 
+                Q(food_type__icontains=search_query)
+            )
+        else:
+            foods = FoodBook.objects.all()
         data = [
             {
                 "id": food.id,
