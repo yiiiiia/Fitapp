@@ -63,44 +63,75 @@ function getCalorieDeficitByDate(date) {
 }
 
 function getTodayIntake(date) {
-    // TODO backend API
-    return {
-        fat: 3, carbohydrate: 57, protein: 35, other: 5
-    }
+    return fetch('/nutrition/food_daily/')
+        .then(response => response.json());
 }
 
 const { createApp } = Vue;
 
+const metabolismApp = Vue.createApp({
+    data() {
+        return {
+            metabolismData: {
+                exerciseMetabolism: 0,
+                dailyBasalMetabolism: 0,
+                caloriesTaken: 0,
+                sumForToday: 0
+            }
+        };
+    },
+    mounted() {
+        fetch('/nutrition/metabolism/')
+            .then(response => response.json())
+            .then(data => {
+                if (data.length > 0) {
+                    const latestData = data[0];
+                    this.metabolismData = latestData;
+                }
+                console.log('Today metabolism:', this.metabolismData);
+            })
+            .catch(error => console.error('Error:', error));
+    }
+}).mount('#metabolism-section');
+
 const barApp = createApp({
     mounted() {
-        this.loadCalorieDeficitThisWeek()
+        this.loadMetabolismDataThisWeek();
     },
     data() {
         return {
-            weeklyCalorieDeficits: []
-        }
+            weeklyMetabolismData: []
+        };
     },
     methods: {
         barStyle(n) {
-            if (n >= 0) {
-                return `height: ${Math.abs(n)}px; background-color: #e6632c`
-            } else {
-                return `height: ${-n}px; background-color: #2eb51f`
-            }
+            return `height: ${Math.abs(n)}px; background-color: #e6632c`;
         },
-        loadCalorieDeficitThisWeek() {
-            let daysOfThisWeek = getDaysOfThisWeek()
-            let index = 0;
-            for (let day in daysOfThisWeek) {
-                let deficit = getCalorieDeficitByDate(day)
-                this.weeklyCalorieDeficits.push({ 'day': weekDayName(index++), 'deficit': deficit })
-            }
+        loadMetabolismDataThisWeek() {
+            fetch('/nutrition/metabolism_7days/')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Received data from API:', data);
+        
+                    this.weeklyMetabolismData = data.map((item, index) => {
+                        const dayName = weekDayName(new Date(item.date).getDay());
+                        const total = item.total;
+                        return { day: dayName, total: total };
+                    });
+        
+                    console.log('Processed weekly metabolism data:', this.weeklyMetabolismData);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
         }
+        
     },
     compilerOptions: {
         delimiters: ["${", "}$"]
     }
-}).mount('#calorie-bar')
+}).mount('#calorie-bar');
+
 
 const pieApp = createApp({
     mounted() {
@@ -116,9 +147,10 @@ const pieApp = createApp({
     },
     methods: {
         loadTodayIntake() {
-            today = parseDate(new Date())
-            // TODO backend api
-            this.intake = getTodayIntake()
+            getTodayIntake().then(data => {
+                this.intake = data;
+                console.log('Today Intake:', this.intake);
+            });
         },
         pieStyle() {
             return `background:

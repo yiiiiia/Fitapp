@@ -10,6 +10,7 @@ from django.urls import reverse
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import status
 
 from .models import UserProfile
 
@@ -47,7 +48,7 @@ def sign_out(request):
 
 class LoginView(APIView):
     def get(self, request):
-        if request.session.get('user_id'):
+        if request.user.is_authenticated:
             return redirect('dashboard')
         else:
             return render(request, 'login.html')
@@ -56,26 +57,28 @@ class LoginView(APIView):
         username = request.data.get('username')
         password = request.data.get('password')
         user = authenticate(username=username, password=password)
-        if user:
-            set_user_in_session(request, user)
+
+        if user is not None:
+            login(request, user)  # 使用Django的login函数来处理登录
             next_page = reverse('dashboard')
-            return JsonResponse({'next_page': next_page}, status=200)
+            return Response({'next_page': next_page}, status=status.HTTP_200_OK)
         else:
             if User.objects.filter(username=username).exists():
                 logger.error("User exists, but authentication failed.")
-                return JsonResponse({'error': 'incorrect password'}, status=404)
+                return Response({'error': 'incorrect password'}, status=status.HTTP_404_NOT_FOUND)
             else:
                 logger.error("User does not exist.")
-                return JsonResponse({'error': 'user not exist'}, status=404)
+                return Response({'error': 'user not exist'}, status=status.HTTP_404_NOT_FOUND)
 
 
 class SignupView(APIView):
     def get(self, request):
-        if request.session.get('user_id'):
-            return redirect('dashboard')
+        if request.user.is_authenticated:
+            next_page = reverse('dashboard')
+            return Response({'next_page': next_page})
         else:
             loginURL = reverse('login')
-            return render(request, 'signup.html', {'login_page': loginURL})
+            return Response({'login_page': loginURL})
 
     def post(self, request, *args, **kwargs):
         username = request.data.get('username')
@@ -83,13 +86,13 @@ class SignupView(APIView):
         password = request.data.get('password')
 
         if not (username and email and password):
-            return JsonResponse({'message': 'Missing fields'}, status=400)
+            return Response({'message': 'Missing fields'}, status=status.HTTP_400_BAD_REQUEST)
 
         if User.objects.filter(username=username).exists():
-            return JsonResponse({'message': 'Username already exists'}, status=400)
+            return Response({'message': 'Username already exists'}, status=status.HTTP_400_BAD_REQUEST)
 
         if User.objects.filter(email=email).exists():
-            return JsonResponse({'message': 'Email already in use'}, status=400)
+            return Response({'message': 'Email already in use'}, status=status.HTTP_400_BAD_REQUEST)
 
         user = User.objects.create(
             username=username,
@@ -97,16 +100,20 @@ class SignupView(APIView):
             password=make_password(password)  # 密码加密
         )
         user.save()
-        return JsonResponse({'message': 'User created successfully'}, status=201)
+        return Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
 
 
-@login_required
-def user_profile(request):
-    if request.method == 'GET':
-        user_id = request.session.get('user_id')
-        user = User.objects.get(id=user_id)
+class UserProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
         return render(request, 'profile.html', {'username': user.get_username(), 'email': user.email})
-    elif request.method == 'POST' or request.method == "PUT":
+
+    def post(self, request):
+        return JsonResponse({'msg': 'good'}, status=200)
+
+    def put(self, request):
         return JsonResponse({'msg': 'good'}, status=200)
 
 

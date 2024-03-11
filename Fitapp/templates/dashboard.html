@@ -139,22 +139,22 @@
 <section class="section block box">
     <div class="columns has-text-centered">
         <div class="column is-one-third">
-            <div class="columns is-multiline">
+            <div id="metabolism-section" class="columns is-multiline">
                 <div class="column is-full">
-                    <p>Exercise Metabolism<span class="ml-4">{{300}}</span></p>
+                    <p>Exercise Metabolism<span class="ml-4">{{ metabolismData.exerciseMetabolism }}</span></p>
                 </div>
                 <div class="column is-full">
-                    <p>Daily Basal Metabolism<span class="ml-4">{{400}}</span></p>
+                    <p>Daily Basal Metabolism<span class="ml-4">{{ metabolismData.dailyBasalMetabolism }}</span></p>
                 </div>
             </div>
         </div>
         <div class="column is-one-third">
             <div class="columns is-multiline">
                 <div class="column is-full">
-                    <p>Calories Taken<span class="ml-4">{{400}}</span></p>
+                    <p>Calories Taken<span class="ml-4">{{ metabolismData.caloriesTaken }}</span></p>
                 </div>
                 <div class="column is-full">
-                    <p>Sum for Today<span class="ml-4">{{400}}</span></p>
+                    <p>Sum for Today<span class="ml-4">{{ metabolismData.sumForToday }}</span></p>
                 </div>
             </div>
         </div>
@@ -163,6 +163,7 @@
         </div>
     </div>
 </section>
+
 <section class="block">
     <div class="columns is-gapless">
         <div id="calorie-bar" class="column is-half box">
