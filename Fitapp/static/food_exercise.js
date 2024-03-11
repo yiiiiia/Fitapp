@@ -67,7 +67,9 @@ const foodExerciseApp = createApp({
     methods: {
         searchByName() {
             if (this.searchInput != '') {
-                this.cards = loadCards(this.pageType, 1, 12, this.searchInput)
+                loadCards(this.pageType, 1, 12, this.searchInput).then(cards => {
+                    this.cards = cards;
+                });
             }
         },
         loadCards() {

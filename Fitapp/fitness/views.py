@@ -1,6 +1,6 @@
 import random
 import string
-
+from django.db.models import Q
 from django.contrib.auth.models import User
 from django.shortcuts import redirect, render
 from rest_framework.decorators import api_view, permission_classes
@@ -38,7 +38,13 @@ def exercise_page(request):
 
 class ExerciseListView(APIView):
     def get(self, request):
-        exercises = ExerciseBook.objects.all()
+        search_query = request.query_params.get('search', None)
+        if search_query:
+            exercises = ExerciseBook.objects.filter(
+                Q(exercise_name__icontains=search_query)
+            )
+        else:
+            exercises = ExerciseBook.objects.all()
         data = [
             {
                 "id": exercise.id,
