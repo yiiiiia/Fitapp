@@ -13,7 +13,9 @@ from django.contrib.auth import login
 from rest_framework.response import Response
 import logging
 from rest_framework.permissions import IsAuthenticated
-
+from nutrition.models import DailyMetabolism
+from .models import UserProfile
+from django.utils import timezone
 
 def login_required(func):
     def wrapper(request):
@@ -121,3 +123,32 @@ def check_username_email(request):
             return JsonResponse({'exists': False}, status=200)
     else:
         return JsonResponse({'error': 'invalid parameter'}, status=400)
+
+class UpdateUserProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        profile, created = UserProfile.objects.get_or_create(user=user)
+
+        profile.age = request.data.get('age', profile.age)
+        profile.gender = request.data.get('gender', profile.gender)
+        profile.height = request.data.get('height', profile.height)
+        profile.weight = request.data.get('weight', profile.weight)
+        profile.save()
+
+        # 计算 BMR
+        if profile.gender == 'male':
+            bmr = 88.362 + (13.397 * profile.weight) + (4.799 * profile.height * 100) - (5.677 * profile.age)
+        else:
+            bmr = 447.593 + (9.247 * profile.weight) + (3.098 * profile.height * 100) - (4.330 * profile.age)
+
+        # 更新 DailyMetabolism
+        daily_metabolism, created = DailyMetabolism.objects.get_or_create(user=user, date=timezone.now().date(), defaults={
+            'bmr': bmr, 'intake': 0, 'exercise_metabolism': 0, 'total': bmr
+        })
+        daily_metabolism.bmr = bmr
+        daily_metabolism.total = bmr + daily_metabolism.intake - daily_metabolism.exercise_metabolism
+        daily_metabolism.save()
+
+        return JsonResponse({'message': 'Profile updated successfully', 'bmr': bmr})

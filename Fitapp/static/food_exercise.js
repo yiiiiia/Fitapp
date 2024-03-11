@@ -33,9 +33,35 @@ function loadCards(cardType, page = 1, pageSize = 12, searchBy = '') {
 // @recordType: 'food' or 'exercise
 // @entity: id of the food or exercise
 function saveRecord(recordType, entityId, quantity) {
-    let today = new Date()
-    return 'ok'
-    // TODO backend API
+    let apiUrl = (recordType === 'food') ? '/nutrition/add_food_eaten/' : '/fitness/add_exercise_done/';
+    let payload = {
+        food: entityId,
+        amount: quantity,
+        date: new Date().toISOString().split('T')[0]
+    };
+
+    return fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': Cookies.get('csrftoken')
+        },
+        body: JSON.stringify(payload),
+        credentials: 'include'
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        return data.message;
+    })
+    .catch(error => {
+        console.error('Save record error:', error);
+        return 'Error';
+    });
 }
 
 const foodExerciseApp = createApp({

@@ -8,9 +8,11 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from .forms import ExerciseBookForm
-from .models import ExerciseBook
+from .models import ExerciseBook, ExerciseDone
+from nutrition.models import DailyMetabolism
 from rest_framework.response import Response
-
+from django.utils import timezone
+from django.http import JsonResponse
 
 class DashboardView(APIView):
     permission_classes = [IsAuthenticated]
@@ -54,3 +56,28 @@ class ExerciseListView(APIView):
             } for exercise in exercises
         ]
         return Response(data)
+    
+class AddExerciseDoneView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        exercise_id = request.data.get('exercise')
+        duration = request.data.get('duration')
+        date = request.data.get('date') or timezone.now().date()
+
+        exercise = ExerciseBook.objects.get(id=exercise_id)
+        ExerciseDone.objects.create(user=user, exercise=exercise, duration=duration, date=date)
+
+        # 检查是否已存在 DailyMetabolism 记录
+        daily_metabolism, created = DailyMetabolism.objects.get_or_create(user=user, date=date, defaults={
+            'bmr': 0, 'intake': 0, 'exercise_metabolism': 0, 'total': 0
+        })
+
+        # 更新 exercise_metabolism 和 total
+        exercise_calories = exercise.calories_burned_per_min * duration
+        daily_metabolism.exercise_metabolism += exercise_calories
+        daily_metabolism.total = daily_metabolism.bmr + daily_metabolism.intake - daily_metabolism.exercise_metabolism
+        daily_metabolism.save()
+
+        return JsonResponse({'message': 'Exercise recorded successfully'})

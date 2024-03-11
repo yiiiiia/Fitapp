@@ -65,8 +65,18 @@ class AddFoodEatenView(APIView):
         date = request.data.get('date') or timezone.now().date()
 
         food = FoodBook.objects.get(id=food_id)
-        FoodEaten.objects.create(user=user, food=food,
-                                 amount=amount, date=date)
+        FoodEaten.objects.create(user=user, food=food, amount=amount, date=date)
+
+        # 检查是否已存在 DailyMetabolism 记录
+        daily_metabolism, created = DailyMetabolism.objects.get_or_create(user=user, date=date, defaults={
+            'bmr': 0, 'intake': 0, 'exercise_metabolism': 0, 'total': 0
+        })
+
+        # 更新 intake 和 total
+        food_calories = food.calories_per_gram * amount
+        daily_metabolism.intake += food_calories
+        daily_metabolism.total = daily_metabolism.bmr + daily_metabolism.intake - daily_metabolism.exercise_metabolism
+        daily_metabolism.save()
 
         return JsonResponse({'message': 'Food added successfully'})
 

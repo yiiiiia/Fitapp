@@ -8,3 +8,12 @@ class ExerciseBook(models.Model):
 
     def __str__(self):
         return f"{self.exercise_name}"
+
+class ExerciseDone(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    exercise = models.ForeignKey('ExerciseBook', on_delete=models.CASCADE)
+    duration = models.IntegerField()
+    date = models.DateField()
+
+    def __str__(self):
+        return f"{self.exercise} - {self.duration} mins"

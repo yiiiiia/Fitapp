@@ -7,7 +7,7 @@ from django.contrib.auth import views as auth_views
 from . import views
 
 urlpatterns = [
-    path('add_food_eaten', AddFoodEatenView.as_view(), name='add_food_eaten'),
+    path('add_food_eaten/', AddFoodEatenView.as_view(), name='add_food_eaten'),
     path('user-data/', UserRelatedDataView.as_view(), name='user-data'),
     path('food_list/', FoodListView.as_view(), name='food_list'),
     path('food_page/', FoodPageView.as_view(), name='food_page'),
