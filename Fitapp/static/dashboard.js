@@ -89,31 +89,47 @@ const barApp = createApp({
     },
     data() {
         return {
-            weeklyMetabolismData: []
+            weeklyMetabolismData: [],
+            maxBarHeight: 100,  // 柱状图的最大高度
+            scale: 1            // 比例系数
         };
     },
     methods: {
+        calculateScale() {
+            const maxValue = Math.max(...this.weeklyMetabolismData.map(item => Math.abs(item.total)));
+            if (maxValue > this.maxBarHeight) {
+                this.scale = this.maxBarHeight / maxValue;
+            } else {
+                this.scale = 1;
+            }
+        },
         barStyle(n) {
-            return `height: ${Math.abs(n)}px; background-color: #e6632c`;
+            const height = Math.abs(n) * this.scale;
+            const isPositive = n >= 0;
+            const bottom = isPositive ? `${100 - height}px` : '100px';
+            return {
+                height: `${height}px`,
+                bottom,
+                backgroundColor: isPositive ? '#4CAF50' : '#FF5722',
+                boxShadow: '2px 2px 8px rgba(0, 0, 0, 0.2)',
+                borderRadius: '5px'
+            };
         },
         loadMetabolismDataThisWeek() {
             fetch('/nutrition/metabolism_7days/')
                 .then(response => response.json())
                 .then(data => {
-                    console.log('Received data from API:', data);
                     this.weeklyMetabolismData = data.map((item, index) => {
                         const dayName = weekDayName(new Date(item.date).getDay());
                         const total = item.total;
                         return { day: dayName, total: total };
                     });
-
-                    console.log('Processed weekly metabolism data:', this.weeklyMetabolismData);
+                    this.calculateScale(); // 确保在获取数据后调用
                 })
                 .catch(error => {
                     console.error('Error:', error);
                 });
         }
-
     },
     compilerOptions: {
         delimiters: ["[[", "]]"]

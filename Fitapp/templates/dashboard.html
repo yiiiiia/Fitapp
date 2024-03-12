@@ -39,9 +39,19 @@
     }
 
     .bar {
-        border-radius: 5px 5px 0 0;
-        width: 50px;
-        position: relative;
+    border-radius: 5px; /* 所有边都添加圆角 */
+    width: 50px;
+    position: absolute;
+    bottom: 0;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2); /* 添加阴影效果 */
+    }
+
+    .bar-positive {
+    background-color: #4CAF50;
+    }
+
+    .bar-negative {
+        background-color: #FF5722;
     }
 
     .bar:last-child {
@@ -141,6 +151,20 @@
     #back-to-user-location:hover {
         background-color: #45a049;
     }
+
+    .bar-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 200px; /* 柱状图容器的高度 */
+    position: relative; /* 使得内部的 .bar 可以相对于它定位 */
+    }
+
+    .bar-placeholder {
+    height: 100px; /* 占位符的高度 */
+    width: 50px;
+    }
+
 </style>
 {% endblock %}
 
@@ -178,9 +202,12 @@
             <h5 class="title is-5 has-text-centered">Weekly Calorie Deficit Graph</h5>
             <hr>
             <div class="graph-container">
-                <div v-for="item in weeklyMetabolismData" class="bar" :style="barStyle(item.total)">
-                    <div class="bar-deficit">[[ item.total ]]</div>
-                </div>
+                <div v-for="item in weeklyMetabolismData" class="bar-container">
+                    <div class="bar" :style="barStyle(item.total)">
+                        <div class="bar-deficit">[[ item.total ]]</div>
+                    </div>
+                    <div class="bar-placeholder"></div>
+                </div>            
             </div>
             <div class="graph-labels">
                 <div v-for="item in weeklyMetabolismData" class="bar-day">[[ item.day ]]</div>
