@@ -80,7 +80,7 @@ class ExerciseListView(APIView):
             {
                 "id": exercise.id,
                 "exercise_name": exercise.exercise_name,
-                "calories_per_min": exercise.calories_burned_per_min * 100,
+                "calories_per_min": exercise.calories_burned_per_min * 1,
                 "image": request.build_absolute_uri(exercise.image.url) if exercise.image else None
             } for exercise in exercises
         ]
