@@ -31,7 +31,7 @@ async function loadCards(cardType, page = 1, pageSize = 12, searchBy = '') {
 // @entity: id of the food or exercise
 async function saveRecord(recordType, entityId, quantity) {
     let apiUrl = (recordType === 'food') ? '/nutrition/add_food_eaten/' : '/fitness/add_exercise_done/';
-    
+
     let payload;
     if (recordType === 'food') {
         payload = {
@@ -61,8 +61,8 @@ async function saveRecord(recordType, entityId, quantity) {
             throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        return { 
-            message: data.message, 
+        return {
+            message: data.message,
             calories: data.calories,
             type: recordType
         };
@@ -142,7 +142,7 @@ const foodExerciseApp = createApp({
                 } else {
                     message = `Calories Burned: ${result.calories}`;
                 }
-                Swal.fire({  // 使用 SweetAlert2 显示提示框
+                Swal.fire({  // use SweetAlert2 box
                     title: 'Success!',
                     text: message,
                     icon: 'success',

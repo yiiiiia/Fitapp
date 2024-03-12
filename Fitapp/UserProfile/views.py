@@ -8,11 +8,12 @@ from django.contrib.auth.models import User
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils import timezone
-from nutrition.models import DailyMetabolism
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from nutrition.models import DailyMetabolism
 
 from .models import UserProfile
 
@@ -34,7 +35,7 @@ class LoginView(APIView):
         user = authenticate(username=username, password=password)
 
         if user is not None:
-            login(request, user)  # 使用Django的login函数来处理登录
+            login(request, user)  # use Django login function
             next_page = reverse('dashboard')
             return Response({'next_page': next_page}, status=status.HTTP_200_OK)
         else:
@@ -80,6 +81,8 @@ class SignupView(APIView):
             password=make_password(password)  # 密码加密
         )
         user.save()
+        # keep user login status
+        login(request, user)
         return Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
 
 
@@ -107,6 +110,13 @@ class UserProfileView(APIView):
     def get(self, request):
         user = request.user
         profile = UserProfile.objects.get(user_id=user.id)
+        conds = [profile, profile.gender, profile.age,
+                 profile.height, profile.weight]
+        complete = True
+        for cond in conds:
+            if cond is None:
+                complete = False
+                break
         if profile:
             if profile.gender:
                 profile.gender = profile.gender.title()
@@ -114,7 +124,13 @@ class UserProfileView(APIView):
                 profile.height = '{:.1f}'.format(profile.height)
             if profile.weight:
                 profile.weight = '{:.1f}'.format(profile.weight)
-        return render(request, 'profile.html', {'username': user.get_username(), 'email': user.email, 'profile': profile})
+        return render(request, 'profile.html',
+                      {
+                          'username': user.get_username(),
+                          'email': user.email,
+                          'profile_complete': complete,
+                          'profile': profile
+                      })
 
     def post(self, request, *args, **kwargs):
         user = request.user

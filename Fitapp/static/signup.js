@@ -72,7 +72,7 @@ const app = createApp({
                     body: JSON.stringify({ 'username': this.form.username, 'password': this.form.password, 'email': this.form.email })
                 })
                 if (resp.status == 201) {
-                    window.location.href = this.$refs.redirect_page.href
+                    window.location.href = '/userprofile/profile/'
                 } else {
                     alert('server internal error')
                 }

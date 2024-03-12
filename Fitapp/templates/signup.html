@@ -17,7 +17,6 @@ Join Fit 35
                 <div id="app-signup" class="column is-mobile is-3-tablet is-3-desktop is-4-widescreen">
                     <form class="box" action="{% url 'signup' %}" @submit.prevent="submit" ref="form">
                         {% csrf_token %}
-                        <a class="is-hidden" href="{% url 'login' %}" ref="redirect_page"></a>
                         <div class="field">
                             <label class="label">User Name</label>
                             <div class="control has-icons-left has-icons-right">

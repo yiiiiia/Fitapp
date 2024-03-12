@@ -17,6 +17,18 @@
 </style>
 {% endblock %}
 
+{% block extra_resources %}
+<script>
+    var profileComplete = "{{ profile_complete }}"
+    if (profileComplete == 'True') {
+        var initGender = "{{profile.gender}}".toLowerCase()
+        var initAge = "{{profile.age}}"
+        var initHeight = "{{profile.height}}"
+        var initWeight = "{{profile.weight}}"
+    }
+</script>
+{% endblock %}
+
 {% block nav %}
 {% endblock %}
 
@@ -88,6 +100,12 @@
             </div>
         </div>
         <div class="column is-half is-hidden" ref="profile-form">
+            {% if not 'profile_complete' %}
+            <div class="notification is-info" ref="notice">
+                <button class="delete" @click="closeNotice"></button>
+                Complete your profile before start using this app!
+            </div>
+            {% endif %}
             <div class="card">
                 <div class="card-content">
                     <form class="block" @submit.prevent="submit">
@@ -141,7 +159,7 @@
     <hr>
 </div>
 
-<script src="{% static 'profile.js' %}"></script>
+<script src="{% static 'profile.js' %}?q=123"></script>
 {% endblock %}
 
 {% block footer %}

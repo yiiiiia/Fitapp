@@ -6,10 +6,14 @@ function isInteger(string) {
 
 const app = createApp({
     mounted() {
-        this.form.gender = this.$refs.gender.innerHTML.toLowerCase()
-        this.form.age = this.$refs.age.innerHTML
-        this.form.height = this.$refs.height.innerHTML
-        this.form.weight = this.$refs.weight.innerHTML
+        if (profileComplete == 'True') {
+            this.form.gender = initGender
+            this.form.age = parseInt(initAge)
+            this.form.height = parseFloat(initHeight)
+            this.form.weight = parseFloat(initWeight)
+        } else {
+            this.edit()
+        }
     },
     data() {
         return {
@@ -34,6 +38,11 @@ const app = createApp({
             this.$refs.weight.innerHTML = weight
             this.$refs['profile-form'].classList.add('is-hidden')
             this.$refs['profile-table'].classList.remove('is-hidden')
+        },
+        closeNotice() {
+            if (this.$refs.notice) {
+                this.$refs.notice.classList.add('is-hidden')
+            }
         },
         validate() {
             let valid = true
@@ -70,7 +79,22 @@ const app = createApp({
                     })
                 }).then(resp => {
                     if (resp.status == 200) {
-                        this.closeEdit()
+                        let message = 'Profile updated!'
+                        if (profileComplete == 'True') {
+                            message = 'Profile created!'
+                        }
+                        Swal.fire({
+                            title: 'Success!',
+                            text: message,
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            if (profileComplete == 'True') {
+                                this.closeEdit()
+                            } else {
+                                window.location.href = '/fitness/dashboard/'
+                            }
+                        });
                     }
                 }).catch(err => {
                     console.log(err)
