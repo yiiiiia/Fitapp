@@ -12,7 +12,7 @@ function parseDate(date) {
 }
 
 function weekDayName(day) {
-    if (day == 7) {
+    if (day == 0) {
         return "Sun"
     }
     if (day == 1) {
