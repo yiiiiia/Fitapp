@@ -51,6 +51,9 @@ class FoodBookSerializer(serializers.ModelSerializer):
 
 
 class FoodListView(APIView):
+    """
+    API view to list all foods or filter them based on a search query.
+    """
     def get(self, request):
         search_query = request.query_params.get('search', None)
         if search_query:
@@ -60,19 +63,13 @@ class FoodListView(APIView):
             )
         else:
             foods = FoodBook.objects.all()
-        data = [
-            {
-                "id": food.id,
-                "name": food.food_name,
-                "category": food.food_type,
-                "calorie": food.calories_per_gram * 100,
-                "image": request.build_absolute_uri(food.image.url) if food.image else None
-            } for food in foods
-        ]
-        return Response(data)
-
+        serializer = FoodBookSerializer(foods, many=True, context={'request': request})
+        return Response(serializer.data)
 
 class AddFoodEatenView(APIView):
+    """
+    API view for adding a food item to the user's eaten food list.
+    """
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
@@ -84,23 +81,12 @@ class AddFoodEatenView(APIView):
         food = FoodBook.objects.get(id=food_id)
         FoodEaten.objects.create(user=user, food=food, amount=amount, date=date)
 
-        # 检查是否已存在 DailyMetabolism 记录
-        daily_metabolism, created = DailyMetabolism.objects.get_or_create(user=user, date=date, defaults={
-            'bmr': 0, 'intake': 0, 'exercise_metabolism': 0, 'total': 0
-        })
-
-        # 更新 intake 和 total
-        food_calories = round(food.calories_per_gram * amount, 1)
-        daily_metabolism.intake += food_calories
-        # 计算 total 并保留一位小数
-        daily_metabolism.total = round(daily_metabolism.intake - daily_metabolism.bmr - daily_metabolism.exercise_metabolism, 1)
-        daily_metabolism.save()
-
-        return JsonResponse({'message': 'Food added successfully', 'calories': food_calories})
-
-
+        return JsonResponse({'message': 'Food added successfully'})
 
 class UserRelatedDataView(APIView):
+    """
+    API view to retrieve food eaten by the user and their daily metabolism data.
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -118,6 +104,9 @@ class UserRelatedDataView(APIView):
 
 
 class FoodPageView(APIView):
+    """
+    API view to render the food exercise page for authenticated users.
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
@@ -134,6 +123,9 @@ class FoodPageView(APIView):
 
 
 class MetabolismView(APIView):
+    """
+    API view to retrieve the user's metabolism data for the current day.
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -144,6 +136,9 @@ class MetabolismView(APIView):
 
 
 class Metabolism7DaysView(APIView):
+    """
+    API view to retrieve the user's metabolism data for the last 7 days.
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -157,6 +152,9 @@ class Metabolism7DaysView(APIView):
 
 
 class FoodDailyView(APIView):
+    """
+    API view to calculate and retrieve the nutrient percentages of the foods eaten by the user for the current day.
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -188,11 +186,13 @@ class FoodDailyView(APIView):
 
         return Response(percentages)
 
-
 def food_records(request):
+    """
+    Django view to retrieve food records for an authenticated user.
+    """
     if request.user.is_authenticated:
-        food_eaten_records = list(FoodEaten.objects.filter(user=request.user).select_related('food').order_by('-date').values('food__food_name', 'amount',
-                                  'date', 'food__calories_per_gram', 'food__protein_per_gram', 'food__fat_per_gram', 'food__carbohydrate_per_gram', 'food__other_per_gram'))
-        return JsonResponse({'food_eaten_records': food_eaten_records}, safe=False)
+        food_eaten_records = FoodEaten.objects.filter(user=request.user).select_related('food').order_by('-date')
+        serializer = FoodEatenSerializer(food_eaten_records, many=True)
+        return JsonResponse({'food_eaten_records': serializer.data}, safe=False)
     else:
         return JsonResponse({'food_eaten_records': []})

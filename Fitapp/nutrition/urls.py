@@ -8,7 +8,7 @@ from . import views
 
 urlpatterns = [
     path('add_food_eaten/', AddFoodEatenView.as_view(), name='add_food_eaten'),
-    path('user-data/', UserRelatedDataView.as_view(), name='user-data'),
+    path('user_related_data/', UserRelatedDataView.as_view(), name='user_related_data'),
     path('food_list/', FoodListView.as_view(), name='food_list'),
     path('food_page/', FoodPageView.as_view(), name='food_page'),
     path('metabolism/', MetabolismView.as_view(), name='metabolism'),

@@ -15,10 +15,14 @@ import logging
 from rest_framework.exceptions import APIException
 from .forms import ExerciseBookForm
 from .models import ExerciseBook, ExerciseDone
+from rest_framework import status
 
 logger = logging.getLogger(__name__)
 
 class DashboardView(APIView):
+    """
+    View for rendering the dashboard page for authenticated users.
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -28,6 +32,10 @@ class DashboardView(APIView):
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def add_exercise(request):
+    """
+    View for adding a new exercise record.
+    Handles both GET and POST requests.
+    """
     if request.method == 'POST':
         form = ExerciseBookForm(request.POST)
         if form.is_valid():
@@ -42,26 +50,30 @@ def add_exercise(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def exercise_page(request):
-    user = request.user
-    letters = string.digits
-    q = ''.join(random.choice(letters) for i in range(10))
+    """
+    View for rendering the exercise page.
+    Generates a random query parameter 'q' for each request.
+    """
+    q = ''.join(random.choice(string.digits) for _ in range(10))
     return render(request, 'food_exercise.html', {
         'food_page': False,
         'page_type': 'exercise',
         'q': q,
-        'username': user.get_username()
+        'username': request.user.get_username()
     })
 
-
 class ExerciseListView(APIView):
+    """
+    API view for listing exercises.
+    Allows filtering based on a search query.
+    """
     def get(self, request):
         search_query = request.query_params.get('search', None)
         if search_query:
-            exercises = ExerciseBook.objects.filter(
-                Q(exercise_name__icontains=search_query)
-            )
+            exercises = ExerciseBook.objects.filter(Q(exercise_name__icontains=search_query))
         else:
             exercises = ExerciseBook.objects.all()
+        
         data = [
             {
                 "id": exercise.id,
@@ -72,8 +84,10 @@ class ExerciseListView(APIView):
         ]
         return Response(data)
 
-
 class AddExerciseDoneView(APIView):
+    """
+    API view for recording an exercise done by a user.
+    """
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
@@ -84,22 +98,12 @@ class AddExerciseDoneView(APIView):
             date = request.data.get('date') or timezone.now().date()
 
             exercise = ExerciseBook.objects.get(id=exercise_id)
-            ExerciseDone.objects.create(
-                user=user, exercise=exercise, duration=duration, date=date)
+            ExerciseDone.objects.create(user=user, exercise=exercise, duration=duration, date=date)
 
-            # 检查是否已存在 DailyMetabolism 记录
-            daily_metabolism, created = DailyMetabolism.objects.get_or_create(user=user, date=date, defaults={
-                'bmr': 0, 'intake': 0, 'exercise_metabolism': 0, 'total': 0
-            })
-
-            # 更新 exercise_metabolism 和 total
-            exercise_calories = round(exercise.calories_burned_per_min * duration, 1)
-            daily_metabolism.exercise_metabolism += exercise_calories
-            daily_metabolism.total = round(daily_metabolism.intake - \
-            daily_metabolism.bmr - daily_metabolism.exercise_metabolism, 1)
-            daily_metabolism.save()
-
-            return JsonResponse({'message': 'Exercise recorded successfully', "calories": exercise_calories})
+            return JsonResponse({'message': 'Exercise recorded successfully'})
+        except ExerciseBook.DoesNotExist:
+            logger.error(f"Exercise with ID {exercise_id} not found")
+            return JsonResponse({'error': 'Exercise not found'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             logger.error(f"Error in AddExerciseDoneView: {e}")
             raise APIException(f"An error occurred: {e}")
