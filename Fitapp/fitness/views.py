@@ -1,23 +1,23 @@
+import logging
 import random
 import string
 
-from django.contrib.auth.models import User
 from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.utils import timezone
-from nutrition.models import DailyMetabolism
+from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.exceptions import APIException
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-import logging
-from rest_framework.exceptions import APIException
+
 from .forms import ExerciseBookForm
 from .models import ExerciseBook, ExerciseDone
-from rest_framework import status
 
 logger = logging.getLogger(__name__)
+
 
 class DashboardView(APIView):
     """
@@ -62,18 +62,21 @@ def exercise_page(request):
         'username': request.user.get_username()
     })
 
+
 class ExerciseListView(APIView):
     """
     API view for listing exercises.
     Allows filtering based on a search query.
     """
+
     def get(self, request):
         search_query = request.query_params.get('search', None)
         if search_query:
-            exercises = ExerciseBook.objects.filter(Q(exercise_name__icontains=search_query))
+            exercises = ExerciseBook.objects.filter(
+                Q(exercise_name__icontains=search_query))
         else:
             exercises = ExerciseBook.objects.all()
-        
+
         data = [
             {
                 "id": exercise.id,
@@ -83,6 +86,7 @@ class ExerciseListView(APIView):
             } for exercise in exercises
         ]
         return Response(data)
+
 
 class AddExerciseDoneView(APIView):
     """
@@ -98,7 +102,8 @@ class AddExerciseDoneView(APIView):
             date = request.data.get('date') or timezone.now().date()
 
             exercise = ExerciseBook.objects.get(id=exercise_id)
-            ExerciseDone.objects.create(user=user, exercise=exercise, duration=duration, date=date)
+            ExerciseDone.objects.create(
+                user=user, exercise=exercise, duration=duration, date=date)
 
             return JsonResponse({'message': 'Exercise recorded successfully'})
         except ExerciseBook.DoesNotExist:

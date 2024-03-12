@@ -108,7 +108,7 @@ const barApp = createApp({
             const isPositive = n >= 0;
             return {
                 height: `${height}px`,
-                backgroundColor: isPositive ? '#4CAF50' : '#FF5722',
+                backgroundColor: isPositive ? '#FF5722': '#4CAF50',
                 boxShadow: '2px 2px 8px rgba(0, 0, 0, 0.2)',
                 borderRadius: '5px'
             };
@@ -117,7 +117,7 @@ const barApp = createApp({
             fetch('/nutrition/metabolism_7days/')
                 .then(response => response.json())
                 .then(data => {
-                    this.weeklyMetabolismData = data.map((item, index) => {
+                    this.weeklyMetabolismData = data.map((item) => {
                         const dayName = weekDayName(new Date(item.date).getDay());
                         const total = item.total;
                         return { day: dayName, total: total };
@@ -152,21 +152,28 @@ const pieApp = createApp({
                 .then(response => response.json())
                 .then(data => {
                     this.intake = data;
-                    console.log('Today Intake:', data);
                 });
         },
         pieStyle() {
-            return `background:
-            conic-gradient(from 0deg,
-                    #037ffc 0,
-                    #037ffc calc(${this.intake.fat}%),
-                    #21cc99 calc(${this.intake.fat}%),
-                    #21cc99 calc(${this.intake.fat + this.intake.carbohydrate}%),
-                    #db5625 calc(${this.intake.fat + this.intake.carbohydrate}%),
-                    #db5625 calc(${this.intake.fat + this.intake.carbohydrate + this.intake.protein}%),
-                    #fce158 calc(${this.intake.fat + this.intake.carbohydrate + this.intake.protein}%),
-                    #fce158 calc(100%)
-            )`
+			if (this.intake.fat == 0 && this.intake.carbohydrate == 0 && this.intake.protein == 0) {
+				return `background:
+				conic-gradient(from 0deg,
+						#f0f0f0 0,
+						#f0f0f0 calc(100%)
+				)`
+			} else {
+				return `background:
+				conic-gradient(from 0deg,
+						#037ffc 0,
+						#037ffc calc(${this.intake.fat}%),
+						#21cc99 calc(${this.intake.fat}%),
+						#21cc99 calc(${this.intake.fat + this.intake.carbohydrate}%),
+						#db5625 calc(${this.intake.fat + this.intake.carbohydrate}%),
+						#db5625 calc(${this.intake.fat + this.intake.carbohydrate + this.intake.protein}%),
+						#fce158 calc(${this.intake.fat + this.intake.carbohydrate + this.intake.protein}%),
+						#fce158 calc(100%)
+				)`
+			}
         }
     },
     compilerOptions: {
