@@ -86,8 +86,6 @@ const metabolismApp = Vue.createApp({
 const barApp = createApp({
     mounted() {
         this.loadMetabolismDataThisWeek();
-        // test code
-        // this.loadMetabolismDataThisWeek1();
     },
     data() {
         return {
@@ -130,23 +128,6 @@ const barApp = createApp({
                     console.error('Error:', error);
                 });
         },
-        loadMetabolismDataThisWeek1() {
-            let testData = [
-                { date: '2024-03-06', total: 50 },
-                { date: '2024-03-07', total: -30 },
-                { date: '2024-03-08', total: 150 },
-                { date: '2024-03-09', total: 250 },
-                { date: '2024-03-10', total: 850 },
-                { date: '2024-03-11', total: -390 },
-                { date: '2024-03-12', total: -70 },
-            ]
-            this.weeklyMetabolismData = testData.map((item, index) => {
-                const dayName = weekDayName(new Date(item.date).getDay());
-                const total = item.total;
-                return { day: dayName, total: total };
-            });
-            this.calculateScale();
-        }
     },
     compilerOptions: {
         delimiters: ["[[", "]]"]
