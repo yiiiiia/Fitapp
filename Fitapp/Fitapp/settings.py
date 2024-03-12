@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-8%&#$nvyr@#v0sg^twvvtqfx)1d1-ksjm6b$8=4_k@m65%n4*o
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['fitapp.pythonanywhere.com','localhost', '127.0.0.1']
 
 if DEBUG:
     CACHES = {
