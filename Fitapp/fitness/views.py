@@ -104,7 +104,8 @@ class AddExerciseDoneView(APIView):
             ExerciseDone.objects.create(
                 user=user, exercise=exercise, duration=duration, date=date)
 
-            return JsonResponse({'message': 'Exercise recorded successfully'})
+            exercise_calories = round(exercise.calories_burned_per_min * duration, 1)
+            return JsonResponse({'message': 'Exercise recorded successfully', "calories": exercise_calories})
         except ExerciseBook.DoesNotExist:
             logger.error(f"Exercise with ID {exercise_id} not found")
             return JsonResponse({'error': 'Exercise not found'}, status=status.HTTP_404_NOT_FOUND)

@@ -95,7 +95,8 @@ class AddFoodEatenView(APIView):
                                  amount=amount,
                                  date=date)
 
-        return JsonResponse({'message': 'Food added successfully'})
+        food_calories = round(food.calories_per_gram * amount, 1)
+        return JsonResponse({'message': 'Food added successfully', "calories": food_calories})
 
 
 class UserRelatedDataView(APIView):
