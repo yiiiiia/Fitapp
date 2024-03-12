@@ -86,12 +86,14 @@ const metabolismApp = Vue.createApp({
 const barApp = createApp({
     mounted() {
         this.loadMetabolismDataThisWeek();
+        // test code
+        // this.loadMetabolismDataThisWeek1();
     },
     data() {
         return {
             weeklyMetabolismData: [],
-            maxBarHeight: 100,  // 柱状图的最大高度
-            scale: 1            // 比例系数
+            maxBarHeight: 300,  // maximum bar height in px
+            scale: 1
         };
     },
     methods: {
@@ -106,10 +108,8 @@ const barApp = createApp({
         barStyle(n) {
             const height = Math.abs(n) * this.scale;
             const isPositive = n >= 0;
-            const bottom = isPositive ? `${100 - height}px` : '100px';
             return {
                 height: `${height}px`,
-                bottom,
                 backgroundColor: isPositive ? '#4CAF50' : '#FF5722',
                 boxShadow: '2px 2px 8px rgba(0, 0, 0, 0.2)',
                 borderRadius: '5px'
@@ -124,11 +124,28 @@ const barApp = createApp({
                         const total = item.total;
                         return { day: dayName, total: total };
                     });
-                    this.calculateScale(); // 确保在获取数据后调用
+                    this.calculateScale();
                 })
                 .catch(error => {
                     console.error('Error:', error);
                 });
+        },
+        loadMetabolismDataThisWeek1() {
+            let testData = [
+                { date: '2024-03-06', total: 50 },
+                { date: '2024-03-07', total: -30 },
+                { date: '2024-03-08', total: 150 },
+                { date: '2024-03-09', total: 250 },
+                { date: '2024-03-10', total: 850 },
+                { date: '2024-03-11', total: -390 },
+                { date: '2024-03-12', total: -70 },
+            ]
+            this.weeklyMetabolismData = testData.map((item, index) => {
+                const dayName = weekDayName(new Date(item.date).getDay());
+                const total = item.total;
+                return { day: dayName, total: total };
+            });
+            this.calculateScale();
         }
     },
     compilerOptions: {

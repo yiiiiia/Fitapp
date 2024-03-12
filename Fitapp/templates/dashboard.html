@@ -25,37 +25,38 @@
         cursor: default;
     }
 
+    .box-title {
+        margin-top: 10px;
+    }
+
     .graph-container {
         display: flex;
         align-items: flex-end;
-        justify-content: space-between;
-        margin-top: 20px;
+        justify-content: space-around;
+        height: 300px;
+        position: relative;
     }
 
     .graph-labels {
         display: flex;
-        justify-content: space-between;
+        justify-content: space-around;
         margin-top: 10px;
     }
 
     .bar {
-    border-radius: 5px; /* 所有边都添加圆角 */
-    width: 50px;
-    position: absolute;
-    bottom: 0;
-    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2); /* 添加阴影效果 */
+        border-radius: 5px;
+        width: 50px;
+        position: absolute;
+        bottom: 0;
+        box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
     }
 
     .bar-positive {
-    background-color: #4CAF50;
+        background-color: #4CAF50;
     }
 
     .bar-negative {
         background-color: #FF5722;
-    }
-
-    .bar:last-child {
-        margin-right: 0;
     }
 
     .bar-deficit {
@@ -152,19 +153,10 @@
         background-color: #45a049;
     }
 
-    .bar-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    height: 200px; /* 柱状图容器的高度 */
-    position: relative; /* 使得内部的 .bar 可以相对于它定位 */
-    }
-
     .bar-placeholder {
-    height: 100px; /* 占位符的高度 */
-    width: 50px;
+        height: 100px;
+        width: 50px;
     }
-
 </style>
 {% endblock %}
 
@@ -199,32 +191,36 @@
 <section class="block">
     <div class="columns is-gapless">
         <div id="calorie-bar-app" class="column is-half box">
-            <h5 class="title is-5 has-text-centered">Weekly Calorie Deficit Graph</h5>
+            <div class="block box-title">
+                <h5 class="title is-5 has-text-centered">Weekly Calorie Deficit Graph</h5>
+            </div>
             <hr>
-            <div class="graph-container">
-                <div v-for="item in weeklyMetabolismData" class="bar-container">
+            <div class="graph-container has-margin">
+                <div v-for="item in weeklyMetabolismData">
                     <div class="bar" :style="barStyle(item.total)">
                         <div class="bar-deficit">[[ item.total ]]</div>
                     </div>
                     <div class="bar-placeholder"></div>
-                </div>            
+                </div>
             </div>
-            <div class="graph-labels">
+            <div class="graph-labels has-margin">
                 <div v-for="item in weeklyMetabolismData" class="bar-day">[[ item.day ]]</div>
             </div>
         </div>
         <div id="calorie-pie-app" class="column is-half box">
-            <h5 class="title is-5 has-text-centered">Today's Nutrition Intake: [[ today ]]</h5>
+            <div class="box-title">
+                <h5 class="title is-5 has-text-centered">Today's Nutrition Intake: [[ today ]]</h5>
+            </div>
             <hr>
             <div class="chart-wrap">
                 <figure class="pie-chart" :style="pieStyle()"></figure>
                 <div class="chart-info">
                     <ul>
-                        <li>Fat [[ intake.fat ]]<span style="background-color: #037ffc;"></span></li>
-                        <li>Carbohydrate [[ intake.carbohydrate ]]<span style="background-color: #21cc99;"></span></li>
-                        <li>Protein [[ intake.protein ]]<span style="background-color: #db5625;"></span>
+                        <li>Fat [[ intake.fat ]]%<span style="background-color: #037ffc;"></span></li>
+                        <li>Carbohydrate [[ intake.carbohydrate ]]%<span style="background-color: #21cc99;"></span></li>
+                        <li>Protein [[ intake.protein ]]%<span style="background-color: #db5625;"></span>
                         </li>
-                        <li>Other [[ intake.other ]]<span style="background-color: #fce158;"></span></li>
+                        <li>Other [[ intake.other ]]%<span style="background-color: #fce158;"></span></li>
                     </ul>
                 </div>
             </div>
