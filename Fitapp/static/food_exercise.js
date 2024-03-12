@@ -31,11 +31,21 @@ async function loadCards(cardType, page = 1, pageSize = 12, searchBy = '') {
 // @entity: id of the food or exercise
 async function saveRecord(recordType, entityId, quantity) {
     let apiUrl = (recordType === 'food') ? '/nutrition/add_food_eaten/' : '/fitness/add_exercise_done/';
-    let payload = {
-        food: entityId,
-        amount: quantity,
-        date: new Date().toISOString().split('T')[0]
-    };
+    
+    let payload;
+    if (recordType === 'food') {
+        payload = {
+            food: entityId,
+            amount: quantity,
+            date: new Date().toISOString().split('T')[0]
+        };
+    } else if (recordType === 'exercise') {
+        payload = {
+            exercise: entityId,
+            duration: quantity,
+            date: new Date().toISOString().split('T')[0]
+        };
+    }
 
     try {
         const response = await fetch(apiUrl, {
@@ -51,10 +61,14 @@ async function saveRecord(recordType, entityId, quantity) {
             throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        return data.message;
+        return { 
+            message: data.message, 
+            calories: data.calories,
+            type: recordType
+        };
     } catch (error) {
         console.error('Save record error:', error);
-        return 'Error';
+        return { message: 'Error', calories: 0, type: recordType };
     }
 }
 
@@ -109,21 +123,40 @@ const foodExerciseApp = createApp({
             this.$refs.num_input.classList.remove('is-danger')
             this.inputErr = ''
         },
-        submit() {
+        async submit() {
             if (this.saveQuantity == '') {
-                this.$refs.num_input.classList.add('is-danger')
-                this.inputErr = (this.pageType == 'food' ? 'Quantity' : 'Time') + ' is required'
-                return
+                this.$refs.num_input.classList.add('is-danger');
+                this.inputErr = (this.pageType == 'food' ? 'Quantity' : 'Time') + ' is required';
+                return;
             }
             if (isNaN(this.saveQuantity)) {
-                this.$refs.num_input.classList.add('is-danger')
-                this.inputErr = 'not a number'
-                return
+                this.$refs.num_input.classList.add('is-danger');
+                this.inputErr = 'not a number';
+                return;
             }
-            if (saveRecord(this.pageType, this.recordItem.id, parseInt(this.saveQuantity, 10))) {
-                this.deactivateModal()
+            const result = await saveRecord(this.pageType, this.recordItem.id, parseInt(this.saveQuantity, 10));
+            if (result.message !== 'Error') {
+                let message = '';
+                if (result.type === 'food') {
+                    message = `Calories Added: ${result.calories}`;
+                } else {
+                    message = `Calories Burned: ${result.calories}`;
+                }
+                Swal.fire({  // 使用 SweetAlert2 显示提示框
+                    title: 'Success!',
+                    text: message,
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    this.deactivateModal();  // 关闭模态框
+                });
             } else {
-                alert('Network error')
+                Swal.fire({
+                    title: 'Error',
+                    text: 'There was a problem saving the record.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
             }
         }
     },

@@ -10,3 +10,4 @@ urlpatterns = [
     path('signout/', views.SignOutView.as_view(), name='signout'),
     path('signup_check/', views.SignupCheckView.as_view(), name='signup_check'),
 ]
+

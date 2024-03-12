@@ -11,10 +11,12 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+import logging
+from rest_framework.exceptions import APIException
 from .forms import ExerciseBookForm
 from .models import ExerciseBook, ExerciseDone
 
+logger = logging.getLogger(__name__)
 
 class DashboardView(APIView):
     permission_classes = [IsAuthenticated]
@@ -64,7 +66,7 @@ class ExerciseListView(APIView):
             {
                 "id": exercise.id,
                 "name": exercise.exercise_name,
-                "calories_burned_per_min": exercise.calories_burned_per_min * 100,
+                "calorie": exercise.calories_burned_per_min * 100,
                 "image": request.build_absolute_uri(exercise.image.url) if exercise.image else None
             } for exercise in exercises
         ]
@@ -75,25 +77,29 @@ class AddExerciseDoneView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-        user = request.user
-        exercise_id = request.data.get('exercise')
-        duration = request.data.get('duration')
-        date = request.data.get('date') or timezone.now().date()
+        try:
+            user = request.user
+            exercise_id = request.data.get('exercise')
+            duration = request.data.get('duration')
+            date = request.data.get('date') or timezone.now().date()
 
-        exercise = ExerciseBook.objects.get(id=exercise_id)
-        ExerciseDone.objects.create(
-            user=user, exercise=exercise, duration=duration, date=date)
+            exercise = ExerciseBook.objects.get(id=exercise_id)
+            ExerciseDone.objects.create(
+                user=user, exercise=exercise, duration=duration, date=date)
 
-        # 检查是否已存在 DailyMetabolism 记录
-        daily_metabolism, created = DailyMetabolism.objects.get_or_create(user=user, date=date, defaults={
-            'bmr': 0, 'intake': 0, 'exercise_metabolism': 0, 'total': 0
-        })
+            # 检查是否已存在 DailyMetabolism 记录
+            daily_metabolism, created = DailyMetabolism.objects.get_or_create(user=user, date=date, defaults={
+                'bmr': 0, 'intake': 0, 'exercise_metabolism': 0, 'total': 0
+            })
 
-        # 更新 exercise_metabolism 和 total
-        exercise_calories = exercise.calories_burned_per_min * duration
-        daily_metabolism.exercise_metabolism += exercise_calories
-        daily_metabolism.total = daily_metabolism.bmr + \
-            daily_metabolism.intake - daily_metabolism.exercise_metabolism
-        daily_metabolism.save()
+            # 更新 exercise_metabolism 和 total
+            exercise_calories = round(exercise.calories_burned_per_min * duration, 1)
+            daily_metabolism.exercise_metabolism += exercise_calories
+            daily_metabolism.total = round(daily_metabolism.intake - \
+            daily_metabolism.bmr - daily_metabolism.exercise_metabolism, 1)
+            daily_metabolism.save()
 
-        return JsonResponse({'message': 'Exercise recorded successfully'})
+            return JsonResponse({'message': 'Exercise recorded successfully', "calories": exercise_calories})
+        except Exception as e:
+            logger.error(f"Error in AddExerciseDoneView: {e}")
+            raise APIException(f"An error occurred: {e}")

@@ -21,10 +21,26 @@ class FoodEatenSerializer(serializers.ModelSerializer):
 
 
 class DailyMetabolismSerializer(serializers.ModelSerializer):
+    bmr = serializers.SerializerMethodField()
+    intake = serializers.SerializerMethodField()
+    exercise_metabolism = serializers.SerializerMethodField()
+    total = serializers.SerializerMethodField()
+
     class Meta:
         model = DailyMetabolism
-        fields = ['id', 'user', 'date', 'bmr',
-                  'intake', 'exercise_metabolism', 'total']
+        fields = ['id', 'user', 'date', 'bmr', 'intake', 'exercise_metabolism', 'total']
+
+    def get_bmr(self, obj):
+        return round(obj.bmr, 1)
+
+    def get_intake(self, obj):
+        return round(obj.intake, 1)
+
+    def get_exercise_metabolism(self, obj):
+        return round(obj.exercise_metabolism, 1)
+
+    def get_total(self, obj):
+        return round(obj.total, 1)
 
 
 class FoodBookSerializer(serializers.ModelSerializer):
@@ -74,12 +90,14 @@ class AddFoodEatenView(APIView):
         })
 
         # 更新 intake 和 total
-        food_calories = food.calories_per_gram * amount
+        food_calories = round(food.calories_per_gram * amount, 1)
         daily_metabolism.intake += food_calories
-        daily_metabolism.total = daily_metabolism.bmr + daily_metabolism.intake - daily_metabolism.exercise_metabolism
+        # 计算 total 并保留一位小数
+        daily_metabolism.total = round(daily_metabolism.intake - daily_metabolism.bmr - daily_metabolism.exercise_metabolism, 1)
         daily_metabolism.save()
 
-        return JsonResponse({'message': 'Food added successfully'})
+        return JsonResponse({'message': 'Food added successfully', 'calories': food_calories})
+
 
 
 class UserRelatedDataView(APIView):

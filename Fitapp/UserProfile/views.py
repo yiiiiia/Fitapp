@@ -129,18 +129,18 @@ class UserProfileView(APIView):
         # 计算 BMR
         if profile.gender == 'male':
             bmr = 88.362 + (13.397 * profile.weight) + (4.799 *
-                                                        profile.height * 100) - (5.677 * profile.age)
+                                                        profile.height) - (5.677 * profile.age)
         else:
             bmr = 447.593 + (9.247 * profile.weight) + (3.098 *
-                                                        profile.height * 100) - (4.330 * profile.age)
+                                                        profile.height) - (4.330 * profile.age)
 
         # 更新 DailyMetabolism
         daily_metabolism, created = DailyMetabolism.objects.get_or_create(user=user, date=timezone.now().date(), defaults={
             'bmr': bmr, 'intake': 0, 'exercise_metabolism': 0, 'total': bmr
         })
         daily_metabolism.bmr = bmr
-        daily_metabolism.total = bmr + daily_metabolism.intake - \
-            daily_metabolism.exercise_metabolism
+        daily_metabolism.total = daily_metabolism.intake - \
+            bmr - daily_metabolism.exercise_metabolism
         daily_metabolism.save()
 
         return Response({'message': 'Profile updated successfully', 'bmr': bmr}, status=status.HTTP_200_OK)

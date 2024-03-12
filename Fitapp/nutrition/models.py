@@ -18,6 +18,15 @@ class DailyMetabolism(models.Model):
     exercise_metabolism = models.FloatField()
     total = models.FloatField()
 
+    def save(self, *args, **kwargs):
+        # 在保存之前格式化浮点数
+        self.bmr = round(self.bmr, 1)
+        self.intake = round(self.intake, 1)
+        self.exercise_metabolism = round(self.exercise_metabolism, 1)
+        self.total = round(self.total, 1)
+
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"BMR: {self.bmr}, Total: {self.total}"
 
