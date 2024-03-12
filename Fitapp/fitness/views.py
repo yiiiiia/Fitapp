@@ -56,7 +56,6 @@ def exercise_page(request):
     """
     q = ''.join(random.choice(string.digits) for _ in range(10))
     return render(request, 'food_exercise.html', {
-        'food_page': False,
         'page_type': 'exercise',
         'q': q,
         'username': request.user.get_username()
@@ -80,8 +79,8 @@ class ExerciseListView(APIView):
         data = [
             {
                 "id": exercise.id,
-                "name": exercise.exercise_name,
-                "calorie": exercise.calories_burned_per_min * 100,
+                "exercise_name": exercise.exercise_name,
+                "calories_per_min": exercise.calories_burned_per_min * 100,
                 "image": request.build_absolute_uri(exercise.image.url) if exercise.image else None
             } for exercise in exercises
         ]

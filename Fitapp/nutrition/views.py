@@ -131,10 +131,9 @@ class FoodPageView(APIView):
 
         return render(
             request, 'food_exercise.html', {
-                'food_page': True,
                 'page_type': 'food',
+                'username': user.get_username(),
                 'q': q,
-                'username': user.get_username()
             })
 
 

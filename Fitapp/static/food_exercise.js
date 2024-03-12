@@ -1,37 +1,9 @@
 const { createApp } = Vue;
 
-// @cardType: 'food' or 'exercise
-async function loadCards(cardType, page = 1, pageSize = 12, searchBy = '') {
-    let apiUrl = (cardType === 'food') ? '/nutrition/food_list/' : '/fitness/exercise_list/';
-    if (searchBy !== '') {
-        apiUrl += '?search=' + encodeURIComponent(searchBy);
-    }
-
-    try {
-        const response = await fetch(apiUrl);
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        return data.map(item => ({
-            id: item.id,
-            image: item.image,
-            name: item.name,
-            category: item.category,
-            calorie: Math.round(item.calorie)
-        }));
-    } catch (error) {
-        console.error('Fetch error:', error);
-        return [];
-    }
-}
-
-
 // @recordType: 'food' or 'exercise
 // @entity: id of the food or exercise
 async function saveRecord(recordType, entityId, quantity) {
     let apiUrl = (recordType === 'food') ? '/nutrition/add_food_eaten/' : '/fitness/add_exercise_done/';
-
     let payload;
     if (recordType === 'food') {
         payload = {
@@ -74,22 +46,20 @@ async function saveRecord(recordType, entityId, quantity) {
 
 const foodExerciseApp = createApp({
     mounted() {
-        let pageType = this.$refs.root.getAttribute('page_type')
         this.pageType = pageType
-        if (pageType == 'food') {
+        if (this.pageType == 'food') {
             this.quantityPlaceholder = 'unit: g'
             this.searchPlaceholder = 'Search food'
-        } else if (pageType == 'exercise') {
+        } else if (this.pageType == 'exercise') {
             this.quantityPlaceholder = 'unit: minute'
             this.searchPlaceholder = 'Search exercise'
         }
-        this.loadCards()
+        this.loadCards('')
     },
     data() {
         return {
             pageType: '',
             cards: [],
-            exerciseCards: [],
             recordItem: {},
             inputErr: '',
             quantityPlaceholder: '',
@@ -101,15 +71,43 @@ const foodExerciseApp = createApp({
     methods: {
         searchByName() {
             if (this.searchInput != '') {
-                loadCards(this.pageType, 1, 12, this.searchInput).then(cards => {
+                this.loadCards(this.searchInput).then(cards => {
                     this.cards = cards;
                 });
             }
         },
-        loadCards() {
-            loadCards(this.pageType).then(cards => {
-                this.cards = cards;
-            });
+        async loadCards(searchBy) {
+            let apiUrl = (this.pageType === 'food') ? '/nutrition/food_list/' : '/fitness/exercise_list/';
+            if (searchBy !== '') {
+                apiUrl += '?search=' + encodeURIComponent(searchBy);
+            }
+
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                if (this.pageType === 'food') {
+                    this.cards = data.map(item => ({
+                        id: item.id,
+                        image: item.image,
+                        category: item.food_type,
+                        name: item.food_name,
+                        calorie: Math.round(item.calories_per_gram)
+                    }));
+                } else if (this.pageType == 'exercise') {
+                    this.cards = data.map(item => ({
+                        id: item.id,
+                        image: item.image,
+                        name: item.exercise_name,
+                        calorie: Math.round(item.calories_per_min)
+                    }));
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                return [];
+            }
         },
         activateModal(item) {
             this.recordItem = item
