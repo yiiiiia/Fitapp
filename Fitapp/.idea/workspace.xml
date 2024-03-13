@@ -2,31 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e4c99e7a-3110-488c-a6d9-ee3a426e1f6f" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/fitness/migrations/0003_exercisebook_image.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/media/exercise_images/boat.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/media/food_images/apple.jpeg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/media/food_images/beef.jpeg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/media/food_images/cake.jpeg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/media/food_images/chips.jpeg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/media/food_images/chocolate.jpeg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/media/food_images/corn.jpeg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/media/food_images/cucumber.jpeg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/media/food_images/hamburger.jpeg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/media/food_images/milk.jpeg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/media/food_images/peanut.jpeg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/media/food_images/potato.jpeg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/media/food_images/rice.jpeg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/media/food_images/sweetpotato.jpeg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/media/food_images/tomato.jpeg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/media/food_images/yogurt.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fitapp/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/Fitapp/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fitapp/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/Fitapp/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fitness/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/fitness/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fitness/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/fitness/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/food_images/grocery_GgbJ3tP.jpeg" beforeDir="false" afterPath="$PROJECT_DIR$/static/grocery.jpeg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/media/food_images/grocery_InuJMl5.jpeg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/nutrition/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/nutrition/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/food_exercise.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/food_exercise.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -49,12 +27,12 @@
     <select />
   </component>
   <component name="FileEditorManager">
-    <leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/nutrition/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-987">
-              <caret line="18" column="29" selection-start-line="18" selection-start-column="29" selection-end-line="18" selection-end-column="29" />
+            <state relative-caret-position="75">
+              <caret line="18" column="15" selection-start-line="18" selection-start-column="15" selection-end-line="18" selection-end-column="15" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
               </folding>
@@ -65,8 +43,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/static/dashboard.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="317">
-              <caret line="322" column="39" selection-start-line="322" selection-start-column="39" selection-end-line="322" selection-end-column="39" />
+            <state relative-caret-position="4575">
+              <caret line="305" selection-start-line="305" selection-end-line="305" />
             </state>
           </provider>
         </entry>
@@ -74,23 +52,26 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Fitapp/settings.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="145">
-              <caret line="49" column="26" selection-start-line="49" selection-start-column="26" selection-end-line="49" selection-end-column="26" />
+            <state relative-caret-position="217">
+              <caret line="47" column="14" lean-forward="true" selection-start-line="47" selection-start-column="14" selection-end-line="47" selection-end-column="14" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Fitapp/urls.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="305">
+              <caret line="25" column="50" selection-start-line="25" selection-start-column="50" selection-end-line="25" selection-end-column="50" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/templates/dashboard.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-190">
-              <caret line="225" column="22" lean-forward="true" selection-start-line="225" selection-start-column="22" selection-end-line="225" selection-end-column="22" />
-              <folding>
-                <element signature="n#style#0;n#div#0;n#div#0;n#div#0;n#div#1;n#div#0;n#section#2;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#div#0;n#div#1;n#div#1;n#div#0;n#section#2;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#button#0;n#div#0;n#div#0;n#div#1;n#div#1;n#div#0;n#section#2;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-              </folding>
+            <state relative-caret-position="345">
+              <caret line="247" column="18" lean-forward="true" selection-start-line="247" selection-start-column="18" selection-end-line="247" selection-end-column="18" />
             </state>
           </provider>
         </entry>
@@ -98,7 +79,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/nutrition/urls.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="270">
+            <state relative-caret-position="180">
               <caret line="18" selection-start-line="18" selection-end-line="18" />
               <folding>
                 <element signature="e#0#28#0" expanded="true" />
@@ -120,9 +101,10 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/Fitapp/settings.py" />
         <option value="$PROJECT_DIR$/templates/dashboard.html" />
         <option value="$PROJECT_DIR$/static/dashboard.js" />
+        <option value="$PROJECT_DIR$/Fitapp/settings.py" />
+        <option value="$PROJECT_DIR$/Fitapp/urls.py" />
       </list>
     </option>
   </component>
@@ -134,8 +116,8 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="541" />
-    <option name="y" value="74" />
+    <option name="x" value="415" />
+    <option name="y" value="25" />
     <option name="width" value="960" />
     <option name="height" value="864" />
   </component>
@@ -155,17 +137,12 @@
             <path>
               <item name="Fitapp" type="b2602c69:ProjectViewProjectNode" />
               <item name="Fitapp" type="462c0819:PsiDirectoryNode" />
-              <item name="content_interaction" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Fitapp" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Fitapp" type="462c0819:PsiDirectoryNode" />
               <item name="Fitapp" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="Fitapp" type="b2602c69:ProjectViewProjectNode" />
               <item name="Fitapp" type="462c0819:PsiDirectoryNode" />
-              <item name="nutrition" type="462c0819:PsiDirectoryNode" />
+              <item name="fitness" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="Fitapp" type="b2602c69:ProjectViewProjectNode" />
@@ -245,24 +222,20 @@
       <option name="presentableId" value="Default" />
       <updated>1710170896759</updated>
       <workItem from="1710170904721" duration="8541000" />
+      <workItem from="1710333792993" duration="376000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="8541000" />
+    <option name="totallyTimeSpent" value="8917000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="541" y="74" width="960" height="864" extended-state="0" />
+    <frame x="416" y="25" width="960" height="864" extended-state="0" />
+    <editor active="true" />
     <layout>
-      <window_info id="Favorites" side_tool="true" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24945533" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.25490198" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info anchor="bottom" id="Docker" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Database Changes" />
-      <window_info anchor="bottom" id="Version Control" />
-      <window_info anchor="bottom" id="Python Console" />
-      <window_info active="true" anchor="bottom" id="Terminal" visible="true" weight="0.32898173" />
-      <window_info anchor="bottom" id="Event Log" side_tool="true" />
+      <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
       <window_info anchor="bottom" id="Run" order="2" />
@@ -270,11 +243,17 @@
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="right" id="SciView" />
-      <window_info anchor="right" id="Database" weight="0.32897604" />
+      <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Version Control" order="8" />
+      <window_info anchor="bottom" id="Database Changes" order="9" />
+      <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
+      <window_info anchor="bottom" id="Terminal" order="11" visible="true" weight="0.32898173" />
+      <window_info anchor="bottom" id="Python Console" order="12" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="SciView" order="3" />
+      <window_info anchor="right" id="Database" order="4" weight="0.32897604" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -311,27 +290,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/nutrition/urls.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="270">
-          <caret line="18" selection-start-line="18" selection-end-line="18" />
-          <folding>
-            <element signature="e#0#28#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Fitapp/settings.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="145">
-          <caret line="49" column="26" selection-start-line="49" selection-start-column="26" selection-end-line="49" selection-end-column="26" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/nutrition/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-987">
-          <caret line="18" column="29" selection-start-line="18" selection-start-column="29" selection-end-line="18" selection-end-column="29" />
+        <state relative-caret-position="75">
+          <caret line="18" column="15" selection-start-line="18" selection-start-column="15" selection-end-line="18" selection-end-column="15" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
           </folding>
@@ -340,21 +302,39 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/static/dashboard.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="317">
-          <caret line="322" column="39" selection-start-line="322" selection-start-column="39" selection-end-line="322" selection-end-column="39" />
+        <state relative-caret-position="4575">
+          <caret line="305" selection-start-line="305" selection-end-line="305" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nutrition/urls.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="18" selection-start-line="18" selection-end-line="18" />
+          <folding>
+            <element signature="e#0#28#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/templates/dashboard.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-190">
-          <caret line="225" column="22" lean-forward="true" selection-start-line="225" selection-start-column="22" selection-end-line="225" selection-end-column="22" />
-          <folding>
-            <element signature="n#style#0;n#div#0;n#div#0;n#div#0;n#div#1;n#div#0;n#section#2;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#div#1;n#div#1;n#div#0;n#section#2;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#button#0;n#div#0;n#div#0;n#div#1;n#div#1;n#div#0;n#section#2;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
-          </folding>
+        <state relative-caret-position="345">
+          <caret line="247" column="18" lean-forward="true" selection-start-line="247" selection-start-column="18" selection-end-line="247" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Fitapp/settings.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="217">
+          <caret line="47" column="14" lean-forward="true" selection-start-line="47" selection-start-column="14" selection-end-line="47" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Fitapp/urls.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="305">
+          <caret line="25" column="50" selection-start-line="25" selection-start-column="50" selection-end-line="25" selection-end-column="50" />
         </state>
       </provider>
     </entry>

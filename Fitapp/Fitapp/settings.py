@@ -47,7 +47,6 @@ INSTALLED_APPS = [
     'UserProfile',
     'fitness',
     'nutrition',
-    'content_interaction',
 ]
 
 MIDDLEWARE = [
