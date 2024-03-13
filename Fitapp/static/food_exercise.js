@@ -69,13 +69,9 @@ const foodExerciseApp = createApp({
         }
     },
     methods: {
-        searchByName() {
-            if (this.searchInput != '') {
-                this.loadCards(this.searchInput).then(cards => {
-                    this.cards = cards;
-                });
-            }
-        },
+		searchByName() {
+			this.loadCards(this.searchInput)
+		},
         async loadCards(searchBy) {
             let apiUrl = (this.pageType === 'food') ? '/nutrition/food_list/' : '/fitness/exercise_list/';
             if (searchBy !== '') {
@@ -106,7 +102,6 @@ const foodExerciseApp = createApp({
                 }
             } catch (error) {
                 console.error('Fetch error:', error);
-                return [];
             }
         },
         activateModal(item) {
