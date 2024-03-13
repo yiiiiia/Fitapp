@@ -1,4 +1,6 @@
-const { createApp } = Vue;
+const {
+    createApp
+} = Vue;
 const app = createApp({
     data() {
         return {
@@ -22,7 +24,10 @@ const app = createApp({
                         "Content-Type": "application/json",
                         'X-CSRFToken': csrftoken
                     },
-                    body: JSON.stringify({ 'username': this.form.username, 'password': this.form.password })
+                    body: JSON.stringify({
+                        'username': this.form.username,
+                        'password': this.form.password
+                    })
                 })
                 if (resp.status == 200) {
                     this.setNormal()
