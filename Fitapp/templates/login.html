@@ -14,8 +14,8 @@ Login Fit 35
     <div class="hero-body">
         <div class="container">
             <div class="columns is-centered">
-                <div id="login_app" class="column is-5-tablet is-5-desktop is-4-widescreen">
-                    <form class="box" @submit.prevent="submit" ref="form">
+                <div id="login_app" class="column is-5-tablet is-5-desktop is-4-widescreen box">
+                    <form @submit.prevent="submit" ref="form">
                         {% csrf_token %}
                         <div class="field">
                             <label class="label">User Name</label>
@@ -42,12 +42,13 @@ Login Fit 35
                         <div class="field">
                             <button class="button is-success is-fullwidth">Login</button>
                         </div>
-                        <p class="has-text-centered is-size-6 mb-2">New to 35 Fit?</p>
-                        <div class="field">
-                            <button class="button is-fullwidth is-primary is-light"><a href="{% url 'signup'  %}">Join
-                                    now</a></button>
-                        </div>
                     </form>
+                    <hr>
+                    <div class="field">
+                        <p class="has-text-centered is-size-6 mb-2">New to 35 Fit?</p>
+                        <button class="button is-fullwidth is-primary is-light"><a href="{% url 'signup'  %}">Join
+                                now</a></button>
+                    </div>
                 </div>
             </div>
         </div>
