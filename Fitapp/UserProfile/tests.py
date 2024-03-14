@@ -1,9 +1,12 @@
 from django.contrib.auth.models import User
-from django.test import TestCase
+from django.test import TestCase, Client
 from rest_framework.test import APIClient
 from rest_framework import status
 from django.urls import reverse
+from nutrition.models import DailyMetabolism
+from UserProfile.middleware import DailyMetabolismMiddleware
 from .models import UserProfile
+from django.utils import timezone
 
 class UserModelTest(TestCase):
     """
@@ -78,3 +81,38 @@ class UserRegistrationAndLoginTest(TestCase):
         data = {'username': 'testuser', 'password': '12345'}
         response = self.client.post(reverse('login'), data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+class DailyMetabolismMiddlewareTest(TestCase):
+
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpass')
+        # Get the UserProfile instance, which will be created with the post_save signal.
+        self.profile = UserProfile.objects.get(user=self.user)
+
+        # Set the UserProfile field manually.
+        self.profile.age = 25
+        self.profile.gender = 'male'
+        self.profile.height = 175
+        self.profile.weight = 70
+        self.profile.save()
+
+    def test_daily_metabolism_update(self):
+        # Creating a Middleware Instance
+        middleware = DailyMetabolismMiddleware(lambda x: x)
+
+        # Simulation Middleware Update DailyMetabolism
+        middleware.update_daily_metabolism(self.user)
+
+        # Get today's DailyMetabolism record!
+        today = timezone.now().date()
+        daily_metabolism = DailyMetabolism.objects.get(user=self.user, date=today)
+
+        # Calculate the expected BMR value
+        expected_bmr = 88.362 + (13.397 * self.profile.weight) + (4.799 * self.profile.height) - (5.677 * self.profile.age)
+
+        # Assertion to check if BMR is up to date
+        self.assertEqual(daily_metabolism.bmr, round(expected_bmr, 1))
+
+    def tearDown(self):
+        self.user.delete()
+        self.profile.delete()
